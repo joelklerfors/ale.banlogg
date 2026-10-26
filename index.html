@@ -868,7 +868,26 @@
   <!-- ==========================================
        7. APPLICATION JAVASCRIPT
   =========================================== -->
+  <!-- Firebase Compat CDN (för att fungera med din befintliga HTML) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
   <script>
+    // Initiera Firebase med din konfiguration
+    const firebaseConfig = {
+      apiKey: "AIzaSyD0X9QF8eNYYGX-W4_7nRVWUm2-7aZuAMc",
+      authDomain: "ale-banlogg.firebaseapp.com",
+      databaseURL: "https://ale-banlogg-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "ale-banlogg",
+      storageBucket: "ale-banlogg.firebasestorage.app",
+      messagingSenderId: "544000044603",
+      appId: "1:544000044603:web:75e65673fdfa4107d7f61e",
+      measurementId: "G-S2P9NV2MN0"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const stateRef = db.ref('banloggState');
+
     // --- CONSTANTS & DEFAULT REGISTERS ---
     const CORRECT_PIN = '1986';
     const STORAGE_KEY = 'ale_banlogg_state_v3';
@@ -1315,38 +1334,59 @@
     }
 
     // --- STORAGE HELPERS ---
-    function loadState() {
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed && Array.isArray(parsed.tasks) && Array.isArray(parsed.history)) {
-            appState = {
-              profiles: Array.isArray(parsed.profiles) && parsed.profiles.length > 0 ? parsed.profiles : [...DEFAULT_PROFILES],
-              workTypes: Array.isArray(parsed.workTypes) && parsed.workTypes.length > 0 ? parsed.workTypes : JSON.parse(JSON.stringify(DEFAULT_WORK_TYPES)),
-              locations: Array.isArray(parsed.locations) && parsed.locations.length > 0 ? parsed.locations : JSON.parse(JSON.stringify(DEFAULT_LOCATIONS)),
-              currentUser: parsed.currentUser || DEFAULT_PROFILES[0],
-              tasks: parsed.tasks,
-              history: parsed.history
-            };
-            if (!appState.profiles.includes(appState.currentUser)) {
-              appState.currentUser = appState.profiles[0];
+    let isFirstLoad = true;
+
+    function loadState(callback) {
+      // Lyssna på ändringar i databasen. Körs på alla enheter omedelbart!
+      stateRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        
+        if (data) {
+          appState = data;
+          
+          // Säkerställ att listorna existerar även om Firebase raderat dem när de var tomma
+          if (!appState.tasks) appState.tasks = [];
+          if (!appState.history) appState.history = [];
+          if (!appState.profiles) appState.profiles = [...DEFAULT_PROFILES];
+          if (!appState.workTypes) appState.workTypes = JSON.parse(JSON.stringify(DEFAULT_WORK_TYPES));
+          if (!appState.locations) appState.locations = JSON.parse(JSON.stringify(DEFAULT_LOCATIONS));
+        } else if (isFirstLoad) {
+          // Om databasen är tom, kolla lokalt eller generera demodata
+          const saved = localStorage.getItem(STORAGE_KEY);
+          if (saved) {
+            try {
+              const parsed = JSON.parse(saved);
+              appState = (parsed && Array.isArray(parsed.tasks)) ? parsed : createInitialDemoData();
+            } catch (e) {
+              appState = createInitialDemoData();
             }
-            return;
+          } else {
+            appState = createInitialDemoData();
           }
+          saveState(); // Skickar datan till Firebase första gången
         }
-      } catch (e) {
-        console.warn('Kunde inte läsa localStorage, laddar standarddata.', e);
-      }
-      appState = createInitialDemoData();
-      saveState();
+
+        // Rita om hela gränssnittet automatiskt om datan uppdateras i bakgrunden
+        if (!isFirstLoad) {
+          populateFilterDropdowns();
+          updateHeaderProfile();
+          renderAll();
+        }
+
+        // Kör appens startsekvens (endast vid första laddningen)
+        if (isFirstLoad && callback) {
+          callback();
+        }
+        isFirstLoad = false;
+      });
     }
 
     function saveState() {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); // Lokal backup
+        stateRef.set(appState); // Skicka till Firebase i realtid
       } catch (e) {
-        showToast('Lagringsutrymmet är fullt (t.ex. för många stora bilder).', 'error');
+        showToast('Något gick fel vid sparning (förmodligen för stor bildfil).', 'error');
       }
     }
 
@@ -3184,12 +3224,19 @@
 
     // --- INITIALIZE APP ON LOAD ---
     window.addEventListener('DOMContentLoaded', () => {
-      loadState();
-      populateFilterDropdowns();
-      initAuth();
-      renderAll();
-      lucide.createIcons();
+      // Vi skickar in startfunktionerna så appen väntar på att Firebase har laddat färdigt
+      loadState(() => {
+        populateFilterDropdowns();
+        initAuth();
+        renderAll();
+        lucide.createIcons();
+      });
     });
   </script>
 </body>
 </html>
+```eof
+
+Du kan kopiera hela innehållet här ovanför och spara i din `index.html`. 
+
+När du laddar upp detta på GitHub Pages så är appen nu en "multiplayer"-app där alla greenkeepers kan se och logga arbeten samtidigt!
