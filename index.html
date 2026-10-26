@@ -209,16 +209,6 @@
               <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Inloggad greenkeeper</p>
               <p id="dropdown-fullname" class="text-sm font-extrabold text-ale-900 truncate">Joel</p>
             </div>
-            <span id="header-username" class="text-xs sm:text-sm font-bold max-w-[90px] sm:max-w-[130px] truncate">Joel K.</span>
-            <i data-lucide="chevron-down" class="w-4 h-4 text-ale-300"></i>
-          </button>
-
-          <!-- Dropdown Menu -->
-          <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-64 bg-white text-slate-800 rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-fade-in">
-            <div class="px-4 py-2.5 border-b border-slate-100">
-              <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Inloggad greenkeeper</p>
-              <p id="dropdown-fullname" class="text-sm font-extrabold text-ale-900 truncate">Joel Klerfors</p>
-            </div>
             <button type="button" onclick="switchUserPrompt()" class="w-full px-4 py-3 text-left text-sm font-semibold hover:bg-slate-50 flex items-center gap-3 text-slate-700">
               <i data-lucide="users" class="w-4 h-4 text-ale-700"></i>
               <span>Byt profil / användare</span>
@@ -256,36 +246,21 @@
     <section id="tab-todo" class="space-y-4">
       
       <!-- Top Summary & Filter Bar -->
-      <div class="bg-white rounded-2xl p-3.5 sm:p-4 shadow-sm border border-slate-200/80 space-y-3">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2">
-              <span>Att göra i fält</span>
-              <span id="todo-count-pill" class="text-xs font-extrabold bg-ale-100 text-ale-900 px-2.5 py-0.5 rounded-full">0 aktiva</span>
-            </h2>
-            <p class="text-xs text-slate-500 font-medium">Brådskande arbeten visas alltid överst</p>
+      <div class="bg-white rounded-2xl p-3.5 sm:p-4 shadow-sm border border-slate-200/80 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-ale-50 flex items-center justify-center border border-ale-100 shrink-0">
+            <i data-lucide="clipboard-list" class="w-5 h-5 text-ale-700"></i>
           </div>
-
-          <!-- Location Dropdown Filter -->
-          <div class="flex items-center gap-2 w-full sm:w-auto">
-            <div class="relative flex-1 sm:w-56">
-              <i data-lucide="map-pin" class="w-4 h-4 text-ale-700 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-              <select id="todo-location-filter" onchange="renderTodoTab()" class="w-full pl-9 pr-8 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-ale-600 appearance-none">
-                <option value="ALL">Alla platser & hål</option>
-                <!-- Populated by JS -->
-              </select>
-              <i data-lucide="chevron-down" class="w-4 h-4 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-            </div>
-            <button type="button" onclick="openJobModal(null, null, true)" class="touch-btn px-3.5 py-2.5 rounded-xl bg-ale-50 hover:bg-ale-100 text-ale-800 border border-ale-200 text-xs font-extrabold flex items-center gap-1.5 shrink-0 transition" title="Logga arbete som redan är utfört direkt till historiken">
-              <i data-lucide="zap" class="w-4 h-4 text-ale-600"></i>
-              <span>Direktlogga</span>
-            </button>
-          </div>
+          <span id="todo-count-pill" class="text-xs sm:text-sm font-extrabold bg-ale-100 text-ale-900 px-3 py-1.5 rounded-xl border border-ale-200 whitespace-nowrap">0 aktiva</span>
         </div>
 
-        <!-- Horizontal Quick Filter Chips for Work Type -->
-        <div id="todo-type-chips" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 pt-0.5">
-          <!-- Populated by JS -->
+        <!-- Work Type Dropdown Filter -->
+        <div class="relative flex-1 max-w-[240px]">
+          <i data-lucide="filter" class="w-4 h-4 text-ale-700 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+          <select id="todo-type-dropdown" onchange="setTodoTypeFilter(this.value)" class="w-full pl-9 pr-8 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-ale-600 appearance-none truncate">
+            <option value="ALL">Alla uppgifter</option>
+          </select>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
         </div>
       </div>
 
@@ -1581,13 +1556,6 @@
 
     // --- POPULATE FILTER DROPDOWNS ---
     function populateFilterDropdowns() {
-      // Todo Location Filter
-      const todoLocSelect = document.getElementById('todo-location-filter');
-      const currentTodoLoc = todoLocSelect.value || 'ALL';
-      todoLocSelect.innerHTML = `<option value="ALL">Alla platser & hål</option>` +
-        LOCATIONS.map(l => `<option value="${escapeHtml(l.id)}">${escapeHtml(l.label)}</option>`).join('');
-      todoLocSelect.value = currentTodoLoc;
-
       // History WorkType Filter
       const histTypeSelect = document.getElementById('history-type-filter');
       const currentHistType = histTypeSelect.value || 'ALL';
@@ -1632,40 +1600,30 @@
     // TAB 1: ATT GÖRA RENDERING
     // ==========================================
     function renderTodoTab() {
-      // 1. Render Quick Filter Chips
-      const chipsContainer = document.getElementById('todo-type-chips');
       const urgentTotal = appState.tasks.filter(t => t.priority === 'Brådskande').length;
 
-      let chipsHtml = `
-        <button type="button" onclick="setTodoTypeFilter('ALL')" class="shrink-0 px-3.5 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 border ${todoSelectedType === 'ALL' ? 'bg-ale-800 text-white border-ale-800 shadow-xs' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'}">
-          <span>Alla</span>
-          <span class="px-1.5 py-0.2 rounded-full text-[11px] ${todoSelectedType === 'ALL' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'}">${appState.tasks.length}</span>
-        </button>
-        <button type="button" onclick="setTodoTypeFilter('URGENT')" class="shrink-0 px-3.5 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 border ${todoSelectedType === 'URGENT' ? 'bg-red-600 text-white border-red-600 shadow-xs' : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'}">
-          <i data-lucide="flame" class="w-3.5 h-3.5 fill-current"></i>
-          <span>Brådskande (${urgentTotal})</span>
-        </button>
-      `;
+      // 1. Populate Work Type Dropdown
+      const dropdown = document.getElementById('todo-type-dropdown');
+      if (dropdown) {
+        let optionsHtml = `<option value="ALL">Alla uppgifter (${appState.tasks.length})</option>`;
+        optionsHtml += `<option value="URGENT">🔥 Brådskande (${urgentTotal})</option>`;
 
-      WORK_TYPES.forEach(wt => {
-        const count = appState.tasks.filter(t => t.workType === wt.id).length;
-        const active = todoSelectedType === wt.id;
-        chipsHtml += `
-          <button type="button" onclick="setTodoTypeFilter('${escapeHtml(wt.id)}')" class="shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border ${active ? 'bg-ale-800 text-white border-ale-800 shadow-xs' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'}">
-            <i data-lucide="${wt.icon}" class="w-3.5 h-3.5"></i>
-            <span>${escapeHtml(wt.label)}</span>
-            ${count > 0 ? `<span class="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${active ? 'bg-white/20 text-white' : 'bg-ale-100 text-ale-900'}">${count}</span>` : ''}
-          </button>
-        `;
-      });
-      chipsContainer.innerHTML = chipsHtml;
+        WORK_TYPES.forEach(wt => {
+          const count = appState.tasks.filter(t => t.workType === wt.id).length;
+          if (count > 0) {
+            optionsHtml += `<option value="${escapeHtml(wt.id)}">${escapeHtml(wt.label)} (${count})</option>`;
+          } else {
+            optionsHtml += `<option value="${escapeHtml(wt.id)}">${escapeHtml(wt.label)}</option>`;
+          }
+        });
+        dropdown.innerHTML = optionsHtml;
+        dropdown.value = todoSelectedType;
+      }
 
       // 2. Filter and Sort Tasks (Urgent always on top, then newest)
-      const locFilter = document.getElementById('todo-location-filter').value || 'ALL';
       let filtered = appState.tasks.filter(task => {
         if (todoSelectedType === 'URGENT' && task.priority !== 'Brådskande') return false;
         if (todoSelectedType !== 'ALL' && todoSelectedType !== 'URGENT' && task.workType !== todoSelectedType) return false;
-        if (locFilter !== 'ALL' && task.location !== locFilter) return false;
         return true;
       });
 
@@ -1681,7 +1639,7 @@
         listContainer.innerHTML = `
           <div class="bg-white rounded-3xl p-8 text-center border border-slate-200 shadow-xs">
             <div class="w-14 h-14 rounded-2xl bg-ale-50 text-ale-700 flex items-center justify-center mx-auto mb-3">
-              <i data-lucide="Sparkles" class="w-7 h-7"></i>
+              <i data-lucide="sparkles" class="w-7 h-7"></i>
             </div>
             <h3 class="text-base font-extrabold text-slate-900">Inga väntande uppgifter här!</h3>
             <p class="text-xs text-slate-500 mt-1 max-w-xs mx-auto">Alla uppgifter för valt filter är klara, eller så kan du lägga till ett nytt arbete.</p>
