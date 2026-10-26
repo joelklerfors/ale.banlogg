@@ -1,0 +1,2711 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#064e3b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Ale Banlogg – Drift & Underhåll</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          colors: {
+            ale: {
+              950: '#022c22',
+              900: '#064e3b',
+              800: '#065f46',
+              700: '#047857',
+              600: '#059669',
+              500: '#10b981',
+              400: '#34d399',
+              100: '#d1fae5',
+              50: '#ecfdf5',
+              bg: '#f3f6f4'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      background-color: #f3f6f4;
+      color: #0f172a;
+      font-family: 'Inter', sans-serif;
+      overscroll-behavior-y: none;
+    }
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+    /* Subtle animations */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .animate-shake {
+      animation: shake 0.35s ease-in-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .animate-slide-up {
+      animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+    /* Glove-friendly touch target sizing */
+    .touch-btn {
+      min-height: 48px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-ale-600 selection:text-white">
+
+  <!-- ==========================================
+       1. PIN LOCK & PROFILE OVERLAY SCREEN
+  =========================================== -->
+  <div id="auth-overlay" class="fixed inset-0 z-50 bg-gradient-to-b from-ale-950 via-ale-900 to-ale-800 text-white flex flex-col justify-between p-4 sm:p-6 overflow-y-auto">
+    
+    <!-- Top Brand Header -->
+    <div class="text-center pt-8 sm:pt-16">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-ale-700/60 border border-ale-400/30 shadow-lg mb-4">
+        <i data-lucide="flag" class="w-10 h-10 text-ale-400"></i>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Ale Banlogg</h1>
+    </div>
+
+    <!-- Step A: PIN Pad View -->
+    <div id="pin-view" class="w-full max-w-sm mx-auto my-auto py-4">
+      <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-3xl p-6 shadow-2xl">
+        <h2 class="text-center text-lg font-bold text-white mb-6">Ange PIN-kod</h2>
+        <p id="pin-status-text" class="hidden text-center text-xs mb-4"></p>
+
+        <!-- 4 PIN Dots -->
+        <div id="pin-dots" class="flex justify-center gap-4 mb-6">
+          <div class="pin-dot w-5 h-5 rounded-full border-2 border-ale-400 bg-transparent transition-all duration-150"></div>
+          <div class="pin-dot w-5 h-5 rounded-full border-2 border-ale-400 bg-transparent transition-all duration-150"></div>
+          <div class="pin-dot w-5 h-5 rounded-full border-2 border-ale-400 bg-transparent transition-all duration-150"></div>
+          <div class="pin-dot w-5 h-5 rounded-full border-2 border-ale-400 bg-transparent transition-all duration-150"></div>
+        </div>
+
+        <!-- Glove-friendly Keypad -->
+        <div class="grid grid-cols-3 gap-3">
+          <button type="button" onclick="pressPin('1')" class="h-16 rounded-2xl bg-white/10 hover:bg-white/20 active:bg-ale-500 active:scale-95 text-2xl font-bold transition flex items-center justify-center shadow-sm border border-white/10">1</button>
+          <button type="button" onclick="pressPin('2')" class="h-16 rounded-2xl bg-white/10 hover:bg-white/20 active:bg-ale-500 active:scale-95 text-2xl font-bold transition flex items-center justify-center shadow-sm border border-white/10">2</button>
+          <button type="button" onclick="pressPin('3')" class="h-16 rounded-2xl bg-white/10 hover:bg-white/20 active:bg-ale-500 active:scale-95 text-2xl font-bold transition flex items-center justify-center shadow-sm border border-white/10">3</button>
+          <button type="button" onclick="pressPin('4')" class="h-16 rounded-2xl bg-white/10 hover:bg-white/20 active:bg-ale-500 active:scale-95 text-2xl font-bold transition flex items-center justify-center shadow-sm border border-white/10">4</button>
+          <button type="button" onclick="pressPin('5')" class="h-16 rounded-2xl bg-white/10 hover:bg-white/20 active:bg-ale-500 active:scale-95 text-2xl font-bold transition flex items-center justify-center shadow-sm border border-white/10">5</button>
+          <button type="button" onclick="pressPin('6')" class="h-16 rounded-2xl bg-white/10 hover:bg-white/20 active:bg-ale-500 active:scale-95 text-2xl font-bold transition flex items-center justify-center shadow-sm border border-white/10">6</button>
+          <button type="button" onclick="pressPin('7')" class="h-16 rounded-2xl bg-white/10 hover:bg-white/20 active:bg-ale-500 active:scale-95 text-2xl font-bold transition flex items-center justify-center shadow-sm border border-white/10">7</button>
+          <button type="button" onclick="pressPin('8')" class="h-16 rounded-2xl bg-white/10 hover:bg-white/20 active:bg-ale-500 active:scale-95 text-2xl font-bold transition flex items-center justify-center shadow-sm border border-white/10">8</button>
+          <button type="button" onclick="pressPin('9')" class="h-16 rounded-2xl bg-white/10 hover:bg-white/20 active:bg-ale-500 active:scale-95 text-2xl font-bold transition flex items-center justify-center shadow-sm border border-white/10">9</button>
+          <button type="button" onclick="clearPin()" class="h-16 rounded-2xl bg-white/5 hover:bg-white/15 active:scale-95 text-xs font-semibold uppercase tracking-wider text-ale-100 transition flex items-center justify-center border border-white/5">Rensa</button>
+          <button type="button" onclick="pressPin('0')" class="h-16 rounded-2xl bg-white/10 hover:bg-white/20 active:bg-ale-500 active:scale-95 text-2xl font-bold transition flex items-center justify-center shadow-sm border border-white/10">0</button>
+          <button type="button" onclick="backspacePin()" class="h-16 rounded-2xl bg-white/5 hover:bg-white/15 active:scale-95 transition flex items-center justify-center border border-white/5" aria-label="Sudda">
+            <i data-lucide="delete" class="w-6 h-6 text-ale-100"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step B: Profile Selection View -->
+    <div id="profile-view" class="hidden w-full max-w-md mx-auto my-auto py-4 animate-fade-in">
+      <div class="bg-white text-slate-900 rounded-3xl p-5 sm:p-6 shadow-2xl">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-xl font-extrabold text-ale-900">Vem jobbar idag?</h2>
+            <p class="text-xs text-slate-500 font-medium">Välj din profil för att logga arbete</p>
+          </div>
+          <span class="inline-flex items-center gap-1 text-xs font-semibold bg-ale-50 text-ale-800 px-2.5 py-1 rounded-full border border-ale-200">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-ale-600"></i> Upplåst
+          </span>
+        </div>
+
+        <!-- Profile List -->
+        <div id="profile-list-container" class="space-y-2.5 max-h-80 overflow-y-auto pr-1 mb-4">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Add New Person Form Toggle -->
+        <div id="new-person-box" class="hidden mb-3 p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
+          <label for="new-person-input" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Namn på ny medarbetare</label>
+          <div class="flex gap-2">
+            <input id="new-person-input" type="text" placeholder="Förnamn Efternamn" class="flex-1 rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ale-600" />
+            <button type="button" onclick="addNewProfile()" class="bg-ale-700 hover:bg-ale-800 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition touch-btn">Spara</button>
+          </div>
+        </div>
+
+        <button type="button" id="toggle-new-person-btn" onclick="toggleNewPersonInput()" class="w-full touch-btn rounded-2xl border-2 border-dashed border-ale-600/40 hover:border-ale-600 bg-ale-50/50 hover:bg-ale-50 text-ale-800 font-bold text-sm flex items-center justify-center gap-2 transition py-3">
+          <i data-lucide="user-plus" class="w-5 h-5 text-ale-600"></i>
+          <span>+ Ny person</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================
+       2. TOP HEADER & DESKTOP NAVIGATION
+  =========================================== -->
+  <header class="sticky top-0 z-30 bg-ale-900 text-white shadow-md border-b border-ale-800">
+    <div class="max-w-5xl mx-auto px-3 sm:px-6 h-14 flex items-center justify-between gap-2">
+      
+      <!-- Brand -->
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-9 h-9 rounded-xl bg-ale-700 flex items-center justify-center border border-ale-500/30 shadow-inner shrink-0">
+          <i data-lucide="flag" class="w-4 h-4 text-ale-400"></i>
+        </div>
+        <div class="truncate">
+          <span class="font-extrabold text-lg sm:text-xl tracking-tight leading-none">Ale Banlogg</span>
+        </div>
+      </div>
+
+      <!-- Actions: Profile Switcher -->
+      <div class="flex items-center gap-2 shrink-0">
+        <!-- Profile Menu Button -->
+        <div class="relative">
+          <button type="button" onclick="toggleProfileMenu()" class="h-9 w-9 sm:w-auto sm:px-3 rounded-xl bg-ale-800 hover:bg-ale-700 border border-ale-600/50 flex items-center justify-center gap-2 transition" title="Byt användare eller lås">
+            <div id="header-avatar" class="w-6 h-6 rounded-full bg-ale-500 text-ale-950 font-extrabold text-xs flex items-center justify-center">
+              J
+            </div>
+            <span id="header-username" class="hidden sm:block text-sm font-bold max-w-[130px] truncate">Joel</span>
+          </button>
+
+          <!-- Dropdown Menu -->
+          <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-64 bg-white text-slate-800 rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-fade-in">
+            <div class="px-4 py-2.5 border-b border-slate-100">
+              <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Inloggad greenkeeper</p>
+              <p id="dropdown-fullname" class="text-sm font-extrabold text-ale-900 truncate">Joel</p>
+            </div>
+            <span id="header-username" class="text-xs sm:text-sm font-bold max-w-[90px] sm:max-w-[130px] truncate">Joel K.</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-ale-300"></i>
+          </button>
+
+          <!-- Dropdown Menu -->
+          <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-64 bg-white text-slate-800 rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-fade-in">
+            <div class="px-4 py-2.5 border-b border-slate-100">
+              <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Inloggad greenkeeper</p>
+              <p id="dropdown-fullname" class="text-sm font-extrabold text-ale-900 truncate">Joel Klerfors</p>
+            </div>
+            <button type="button" onclick="switchUserPrompt()" class="w-full px-4 py-3 text-left text-sm font-semibold hover:bg-slate-50 flex items-center gap-3 text-slate-700">
+              <i data-lucide="users" class="w-4 h-4 text-ale-700"></i>
+              <span>Byt profil / användare</span>
+            </button>
+            <button type="button" onclick="openJobModal(null, null, true)" class="w-full px-4 py-3 text-left text-sm font-semibold hover:bg-slate-50 flex items-center gap-3 text-slate-700">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-ale-700"></i>
+              <span>Direktlogga utfört arbete</span>
+            </button>
+            <button type="button" onclick="confirmResetDemoData()" class="w-full px-4 py-3 text-left text-sm font-semibold hover:bg-slate-50 flex items-center gap-3 text-slate-700">
+              <i data-lucide="rotate-ccw" class="w-4 h-4 text-amber-600"></i>
+              <span>Återställ demodata</span>
+            </button>
+            <div class="border-t border-slate-100 mt-1 pt-1">
+              <button type="button" onclick="lockApp()" class="w-full px-4 py-3 text-left text-sm font-bold hover:bg-red-50 flex items-center gap-3 text-red-600">
+                <i data-lucide="lock" class="w-4 h-4"></i>
+                <span>Lås med PIN-kod</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+
+  <!-- ==========================================
+       3. MAIN CONTENT CONTAINER
+  =========================================== -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-3 sm:px-6 pt-4 pb-24 md:pb-24">
+
+    <!-- ==========================================
+         TAB 1: ATT GÖRA (ACTIVE TASKS)
+    =========================================== -->
+    <section id="tab-todo" class="space-y-4">
+      
+      <!-- Top Summary & Filter Bar -->
+      <div class="bg-white rounded-2xl p-3.5 sm:p-4 shadow-sm border border-slate-200/80 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2">
+              <span>Att göra i fält</span>
+              <span id="todo-count-pill" class="text-xs font-extrabold bg-ale-100 text-ale-900 px-2.5 py-0.5 rounded-full">0 aktiva</span>
+            </h2>
+            <p class="text-xs text-slate-500 font-medium">Brådskande arbeten visas alltid överst</p>
+          </div>
+
+          <!-- Location Dropdown Filter -->
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <div class="relative flex-1 sm:w-56">
+              <i data-lucide="map-pin" class="w-4 h-4 text-ale-700 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+              <select id="todo-location-filter" onchange="renderTodoTab()" class="w-full pl-9 pr-8 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-ale-600 appearance-none">
+                <option value="ALL">Alla platser & hål</option>
+                <!-- Populated by JS -->
+              </select>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            </div>
+            <button type="button" onclick="openJobModal(null, null, true)" class="touch-btn px-3.5 py-2.5 rounded-xl bg-ale-50 hover:bg-ale-100 text-ale-800 border border-ale-200 text-xs font-extrabold flex items-center gap-1.5 shrink-0 transition" title="Logga arbete som redan är utfört direkt till historiken">
+              <i data-lucide="zap" class="w-4 h-4 text-ale-600"></i>
+              <span>Direktlogga</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Horizontal Quick Filter Chips for Work Type -->
+        <div id="todo-type-chips" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 pt-0.5">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Task Cards List -->
+      <div id="todo-list-container" class="space-y-3.5">
+        <!-- Populated by JS -->
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         TAB 2: BANA (COURSE & AREA OVERVIEW)
+    =========================================== -->
+    <section id="tab-course" class="hidden space-y-6">
+      
+      <!-- All Holes (1-18) General Banner Card -->
+      <div id="all-holes-card-container">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- Section 1: Holes 1-18 -->
+      <div class="space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2">
+              <i data-lucide="flag" class="w-5 h-5 text-ale-700"></i>
+              <span>Banan: Hål 1–18</span>
+            </h2>
+            <p class="text-xs text-slate-500 font-medium">Tryck på ett hål för att se aktiva jobb, senaste skötsel eller lägga till uppgift</p>
+          </div>
+
+          <!-- Filter: Alla 18 / Första 9 / Sista 9 -->
+          <div class="inline-flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm self-start">
+            <button type="button" onclick="setCourseHoleFilter('ALL')" id="hole-filter-ALL" class="px-3 py-1.5 rounded-lg text-xs font-extrabold transition bg-ale-800 text-white">Alla 18</button>
+            <button type="button" onclick="setCourseHoleFilter('FRONT9')" id="hole-filter-FRONT9" class="px-3 py-1.5 rounded-lg text-xs font-extrabold transition text-slate-600 hover:bg-slate-100">Första 9 (1–9)</button>
+            <button type="button" onclick="setCourseHoleFilter('BACK9')" id="hole-filter-BACK9" class="px-3 py-1.5 rounded-lg text-xs font-extrabold transition text-slate-600 hover:bg-slate-100">Sista 9 (10–18)</button>
+          </div>
+        </div>
+
+        <!-- 18 Holes Grid -->
+        <div id="holes-grid-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5 sm:gap-3">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Section 2: Practice Areas & Facility -->
+      <div class="space-y-3 pt-2">
+        <div>
+          <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2">
+            <i data-lucide="compass" class="w-5 h-5 text-ale-700"></i>
+            <span>Övningsytor & Anläggning</span>
+          </h2>
+          <p class="text-xs text-slate-500 font-medium">Driving Range, Humlegården, Puttinggreen, Bunkrar, Korthålsbana & Verkstad</p>
+        </div>
+
+        <div id="areas-grid-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         TAB 3: HISTORIK (COMPLETED LOGBOOK)
+    =========================================== -->
+    <section id="tab-history" class="hidden space-y-4">
+      
+      <!-- Search & Filter Panel -->
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2">
+              <i data-lucide="book-open-check" class="w-5 h-5 text-ale-700"></i>
+              <span>Loggbok & Historik</span>
+            </h2>
+            <p class="text-xs text-slate-500 font-medium">Se exakt när dammkanter, klippning eller luftning utfördes senast</p>
+          </div>
+          <button type="button" onclick="resetHistoryFilters()" class="text-xs font-bold text-ale-700 hover:text-ale-900 bg-ale-50 hover:bg-ale-100 px-3 py-2 rounded-xl transition flex items-center gap-1">
+            <i data-lucide="Filter-x" class="w-3.5 h-3.5"></i>
+            <span>Nollställ filter</span>
+          </button>
+        </div>
+
+        <!-- Search Input -->
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input id="history-search-input" type="text" oninput="renderHistoryTab()" placeholder="Sök på kommentar, t.ex. '3.5 mm', 'sprinkler', 'damm'..." class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ale-600" />
+        </div>
+
+        <!-- 3 Filter Dropdowns: Arbetstyp, Plats, Person -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <div>
+            <label for="history-type-filter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Arbetstyp</label>
+            <select id="history-type-filter" onchange="renderHistoryTab()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-ale-600">
+              <option value="ALL">Alla arbetstyper</option>
+              <!-- Populated by JS -->
+            </select>
+          </div>
+          <div>
+            <label for="history-location-filter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Plats / Hål</label>
+            <select id="history-location-filter" onchange="renderHistoryTab()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-ale-600">
+              <option value="ALL">Alla platser</option>
+              <!-- Populated by JS -->
+            </select>
+          </div>
+          <div>
+            <label for="history-person-filter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Utförd av</label>
+            <select id="history-person-filter" onchange="renderHistoryTab()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-ale-600">
+              <option value="ALL">Alla i teamet</option>
+              <!-- Populated by JS -->
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- History Count & Quick Summary Banner -->
+      <div class="flex items-center justify-between px-1">
+        <p id="history-results-label" class="text-xs font-bold text-slate-600 uppercase tracking-wider">Visar 0 loggade arbeten</p>
+      </div>
+
+      <!-- History List -->
+      <div id="history-list-container" class="space-y-3">
+        <!-- Populated by JS -->
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- ==========================================
+       4. FLOATING ACTION BUTTON (+ NYTT ARBETE)
+  =========================================== -->
+  <button type="button" onclick="openJobModal()" class="fixed right-4 bottom-20 z-30 bg-ale-700 hover:bg-ale-800 active:scale-95 text-white rounded-2xl px-5 h-14 shadow-xl shadow-ale-950/30 border border-ale-400/30 flex items-center gap-2.5 font-extrabold text-sm sm:text-base transition">
+    <i data-lucide="plus" class="w-6 h-6 stroke-[3]"></i>
+    <span>Nytt arbete</span>
+  </button>
+
+
+  <!-- ==========================================
+       5. UNIVERSAL BOTTOM NAVIGATION BAR
+  =========================================== -->
+  <nav class="fixed bottom-0 inset-x-0 z-30 bg-white border-t border-slate-200 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+    <div class="max-w-5xl mx-auto grid grid-cols-3 h-16">
+      <button type="button" onclick="switchTab('todo')" id="mob-tab-todo" class="flex flex-col items-center justify-center gap-1 relative font-extrabold transition text-ale-800 bg-ale-50/40">
+        <div class="relative">
+          <i data-lucide="clipboard-list" class="w-6 h-6"></i>
+          <span id="mob-badge-todo" class="absolute -top-1.5 -right-3 bg-ale-600 text-white text-[10px] font-extrabold px-1.5 py-0.2 rounded-full min-w-[18px] text-center">0</span>
+        </div>
+        <span class="text-xs">Att göra</span>
+        <div id="mob-ind-todo" class="absolute top-0 inset-x-6 h-1 bg-ale-700 rounded-b-full"></div>
+      </button>
+
+      <button type="button" onclick="switchTab('course')" id="mob-tab-course" class="flex flex-col items-center justify-center gap-1 relative font-semibold transition text-slate-500 hover:text-slate-800">
+        <i data-lucide="map" class="w-6 h-6"></i>
+        <span class="text-xs">Bana</span>
+        <div id="mob-ind-course" class="hidden absolute top-0 inset-x-6 h-1 bg-ale-700 rounded-b-full"></div>
+      </button>
+
+      <button type="button" onclick="switchTab('history')" id="mob-tab-history" class="flex flex-col items-center justify-center gap-1 relative font-semibold transition text-slate-500 hover:text-slate-800">
+        <i data-lucide="history" class="w-6 h-6"></i>
+        <span class="text-xs">Historik</span>
+        <div id="mob-ind-history" class="hidden absolute top-0 inset-x-6 h-1 bg-ale-700 rounded-b-full"></div>
+      </button>
+    </div>
+  </nav>
+
+
+  <!-- ==========================================
+       6. MODALS & DRAWERS
+  =========================================== -->
+
+  <!-- MODAL A: COMPLETE TASK ("KLARMARKERA") -->
+  <div id="complete-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[92vh] flex flex-col animate-slide-up overflow-hidden">
+      <!-- Header -->
+      <div class="bg-ale-900 text-white px-5 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-ale-700 flex items-center justify-center">
+            <i data-lucide="check-check" class="w-5 h-5 text-ale-300"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base sm:text-lg leading-tight">Klarmarkera arbete</h3>
+            <p id="complete-modal-subtitle" class="text-xs text-ale-200 truncate max-w-[260px]">Hål 4 • Dammkanter</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeCompleteModal()" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-5 overflow-y-auto space-y-5 flex-1">
+        <!-- Who performed it? -->
+        <div>
+          <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2">
+            Vem utförde arbetet? <span class="text-slate-400 font-normal">(välj en eller flera)</span>
+          </label>
+          <div id="complete-performers-chips" class="flex flex-wrap gap-2">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Quick Comment Suggestions + Textarea -->
+        <div>
+          <label for="complete-comment-input" class="block text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2">
+            Utförarkommentar / Notering
+          </label>
+          <!-- Glove-friendly quick chips -->
+          <div class="flex flex-wrap gap-1.5 mb-2.5">
+            <button type="button" onclick="appendQuickComment('Klippt på 3.5 mm.')" class="text-xs font-semibold bg-ale-50 hover:bg-ale-100 text-ale-900 border border-ale-200 px-2.5 py-1.5 rounded-lg transition">+ Klippt på 3.5 mm</button>
+            <button type="button" onclick="appendQuickComment('Utfört enligt plan utan anmärkning.')" class="text-xs font-semibold bg-ale-50 hover:bg-ale-100 text-ale-900 border border-ale-200 px-2.5 py-1.5 rounded-lg transition">+ Enligt plan</button>
+            <button type="button" onclick="appendQuickComment('Damm tömd på skräp & trimmad.')" class="text-xs font-semibold bg-ale-50 hover:bg-ale-100 text-ale-900 border border-ale-200 px-2.5 py-1.5 rounded-lg transition">+ Damm tömd på skräp</button>
+            <button type="button" onclick="appendQuickComment('Ny flaggplacering satt.')" class="text-xs font-semibold bg-ale-50 hover:bg-ale-100 text-ale-900 border border-ale-200 px-2.5 py-1.5 rounded-lg transition">+ Ny flaggplacering</button>
+            <button type="button" onclick="appendQuickComment('Maskin rengjord & kontrollerad.')" class="text-xs font-semibold bg-ale-50 hover:bg-ale-100 text-ale-900 border border-ale-200 px-2.5 py-1.5 rounded-lg transition">+ Maskin rengjord</button>
+          </div>
+          <textarea id="complete-comment-input" rows="3" placeholder="T.ex. Klippt på 3.5mm, damm 4 tömd på skräp..." class="w-full rounded-2xl border border-slate-300 p-3.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ale-600"></textarea>
+        </div>
+
+        <!-- Photo Attachment -->
+        <div>
+          <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2">
+            Bifoga bild på utfört arbete (valfritt)
+          </label>
+          <div id="complete-photos-preview" class="flex flex-wrap gap-2.5 mb-2"></div>
+          <label class="touch-btn cursor-pointer w-full rounded-2xl border-2 border-dashed border-slate-300 hover:border-ale-600 bg-slate-50 hover:bg-ale-50/40 flex items-center justify-center gap-2 py-3 text-xs sm:text-sm font-bold text-slate-700 transition">
+            <i data-lucide="camera" class="w-5 h-5 text-ale-700"></i>
+            <span>Ta foto / välj bild</span>
+            <input type="file" accept="image/*" class="hidden" onchange="handlePhotoUpload(event, 'complete')" />
+          </label>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex gap-2.5">
+        <button type="button" onclick="closeCompleteModal()" class="touch-btn px-4 rounded-2xl border border-slate-300 bg-white font-bold text-sm text-slate-700 hover:bg-slate-100">Avbryt</button>
+        <button type="button" onclick="submitCompleteTask()" class="touch-btn flex-1 rounded-2xl bg-ale-700 hover:bg-ale-800 active:scale-98 text-white font-extrabold text-sm sm:text-base shadow-md flex items-center justify-center gap-2 transition">
+          <i data-lucide="archive-restore" class="w-5 h-5"></i>
+          <span>Spara och arkivera till historik</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- MODAL B: CREATE / EDIT / DIRECT-LOG JOB -->
+  <div id="job-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-xl rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[94vh] flex flex-col animate-slide-up overflow-hidden">
+      <!-- Header -->
+      <div class="bg-ale-900 text-white px-5 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-ale-700 flex items-center justify-center">
+            <i id="job-modal-icon" data-lucide="plus-circle" class="w-5 h-5 text-ale-300"></i>
+          </div>
+          <div>
+            <h3 id="job-modal-title" class="font-extrabold text-base sm:text-lg leading-tight">Skapa nytt arbete</h3>
+            <p id="job-modal-desc" class="text-xs text-ale-200">Lägg till uppgift i "Att göra" eller direktlogga</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeJobModal()" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-4 sm:p-5 overflow-y-auto space-y-5 flex-1">
+        
+        <!-- 1. Location Selector (Categorized for glove-friendly speed) -->
+        <div>
+          <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2">
+            1. Välj plats / område
+          </label>
+
+          <!-- Category Tabs -->
+          <div class="grid grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-xl mb-3">
+            <button type="button" onclick="setJobLocationGroup('HOLES')" id="loc-grp-HOLES" class="py-2 rounded-lg text-xs font-extrabold transition bg-white text-ale-900 shadow-xs">Hål 1–18</button>
+            <button type="button" onclick="setJobLocationGroup('ALL_HOLES')" id="loc-grp-ALL_HOLES" class="py-2 rounded-lg text-xs font-extrabold transition text-slate-600">Alla hål (1–18)</button>
+            <button type="button" onclick="setJobLocationGroup('AREAS')" id="loc-grp-AREAS" class="py-2 rounded-lg text-xs font-extrabold transition text-slate-600">Övningsytor m.m.</button>
+          </div>
+
+          <!-- Holes 1-18 Quick Number Pad -->
+          <div id="job-loc-holes-grid" class="grid grid-cols-6 gap-1.5">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Practice Areas & Workshop List -->
+          <div id="job-loc-areas-grid" class="hidden grid-cols-1 sm:grid-cols-2 gap-2">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Selected Location Indicator -->
+          <div class="mt-2.5 flex items-center justify-between bg-ale-50 border border-ale-200 rounded-xl px-3.5 py-2">
+            <span class="text-xs font-semibold text-ale-900">Vald plats:</span>
+            <span id="job-selected-location-badge" class="text-xs font-extrabold text-ale-950 bg-white px-2.5 py-1 rounded-lg border border-ale-300 shadow-2xs">Hål 1</span>
+          </div>
+        </div>
+
+        <!-- 2. Work Type Selector -->
+        <div>
+          <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2">
+            2. Välj arbetstyp
+          </label>
+          <div id="job-worktype-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- 3. Priority Selector -->
+        <div id="job-priority-section">
+          <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2">
+            3. Välj prioritet
+          </label>
+          <div class="grid grid-cols-2 gap-3">
+            <button type="button" onclick="setJobPriority('Normal')" id="prio-btn-Normal" class="touch-btn rounded-2xl border-2 px-4 py-3 font-extrabold text-sm flex items-center justify-center gap-2 transition">
+              <i data-lucide="check-circle" class="w-5 h-5"></i>
+              <span>Normal</span>
+            </button>
+            <button type="button" onclick="setJobPriority('Brådskande')" id="prio-btn-Urgent" class="touch-btn rounded-2xl border-2 px-4 py-3 font-extrabold text-sm flex items-center justify-center gap-2 transition">
+              <i data-lucide="flame" class="w-5 h-5"></i>
+              <span>Brådskande</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. Title (Smart auto-suggestion + editable) -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label for="job-title-input" class="text-xs font-extrabold uppercase tracking-wider text-slate-600">
+              4. Rubrik
+            </label>
+            <button type="button" onclick="fillSuggestedTitle(true)" class="text-[11px] font-bold text-ale-700 hover:underline">Föreslå rubrik</button>
+          </div>
+          <input id="job-title-input" type="text" placeholder="T.ex. Klippning green på Hål 4" class="w-full rounded-2xl border border-slate-300 px-3.5 py-3 text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-ale-600" />
+        </div>
+
+        <!-- 5. Instruction / Comment -->
+        <div>
+          <label for="job-comment-input" id="job-comment-label" class="block text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-1.5">
+            5. Instruktion / kommentar (Vem eller hur?)
+          </label>
+          <textarea id="job-comment-input" rows="3" placeholder="T.ex. Ta med röjsåg vid dammkanten, eller skriv vad som behöver åtgärdas..." class="w-full rounded-2xl border border-slate-300 p-3.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ale-600"></textarea>
+        </div>
+
+        <!-- 6. Attach Photos -->
+        <div>
+          <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2">
+            6. Bilder (valfritt)
+          </label>
+          <div id="job-photos-preview" class="flex flex-wrap gap-2.5 mb-2"></div>
+          <label class="touch-btn cursor-pointer w-full rounded-2xl border-2 border-dashed border-slate-300 hover:border-ale-600 bg-slate-50 hover:bg-ale-50/40 flex items-center justify-center gap-2 py-3 text-xs sm:text-sm font-bold text-slate-700 transition">
+            <i data-lucide="camera" class="w-5 h-5 text-ale-700"></i>
+            <span>Lägg till bild / ta foto</span>
+            <input type="file" accept="image/*" class="hidden" onchange="handlePhotoUpload(event, 'job')" />
+          </label>
+        </div>
+
+      </div>
+
+      <!-- Footer with Save & Direct-Log Option -->
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row gap-2">
+        <button type="button" onclick="closeJobModal()" class="touch-btn px-4 rounded-2xl border border-slate-300 bg-white font-bold text-sm text-slate-700 hover:bg-slate-100 order-3 sm:order-1">
+          Avbryt
+        </button>
+        <button type="button" id="job-direct-log-btn" onclick="saveJob(true)" class="touch-btn px-4 rounded-2xl border-2 border-ale-700 bg-ale-50 hover:bg-ale-100 text-ale-900 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition order-2">
+          <i data-lucide="check-check" class="w-4 h-4 text-ale-700"></i>
+          <span>Direktlogga som redan utfört</span>
+        </button>
+        <button type="button" id="job-save-btn" onclick="saveJob(false)" class="touch-btn flex-1 rounded-2xl bg-ale-700 hover:bg-ale-800 text-white font-extrabold text-sm sm:text-base shadow-md flex items-center justify-center gap-2 transition order-1 sm:order-3">
+          <i data-lucide="check" class="w-5 h-5"></i>
+          <span id="job-save-btn-text">Lägg till i Att göra</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- MODAL C: LOCATION DETAIL DRAWER / MODAL (FLIK 2: BANA) -->
+  <div id="location-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-2xl rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[92vh] flex flex-col animate-slide-up overflow-hidden">
+      
+      <!-- Header -->
+      <div class="bg-ale-900 text-white px-5 py-4 flex items-center justify-between gap-2">
+        <div class="flex items-center gap-3 min-w-0">
+          <div id="loc-modal-badge" class="w-11 h-11 rounded-2xl bg-ale-700 border border-ale-400/30 flex items-center justify-center font-extrabold text-lg shrink-0">
+            4
+          </div>
+          <div class="truncate">
+            <h3 id="loc-modal-title" class="font-extrabold text-lg sm:text-xl leading-tight truncate">Hål 4</h3>
+            <p id="loc-modal-subtitle" class="text-xs text-ale-200">Områdesöversikt & underhållslogg</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <button type="button" id="loc-modal-add-btn" class="bg-ale-500 hover:bg-ale-400 text-ale-950 font-extrabold text-xs sm:text-sm px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 shadow-sm transition">
+            <i data-lucide="plus" class="w-4 h-4 stroke-[3]"></i>
+            <span>Lägg till jobb här</span>
+          </button>
+          <button type="button" onclick="closeLocationModal()" class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1 bg-ale-bg">
+        
+        <!-- 1. Active Tasks on this location -->
+        <div>
+          <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2.5 flex items-center gap-1.5">
+            <i data-lucide="clipboard-list" class="w-4 h-4 text-ale-700"></i>
+            <span>Aktiva uppgifter på platsen</span>
+          </h4>
+          <div id="loc-modal-active-list" class="space-y-2.5">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- 2. Latest Maintenance Summary Matrix -->
+        <div>
+          <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2.5 flex items-center gap-1.5">
+            <i data-lucide="clock" class="w-4 h-4 text-ale-700"></i>
+            <span>Senaste underhåll på platsen</span>
+          </h4>
+          <div id="loc-modal-last-maint" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- 3. Chronological Location History -->
+        <div>
+          <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2.5 flex items-center gap-1.5">
+            <i data-lucide="history" class="w-4 h-4 text-ale-700"></i>
+            <span>Platshistorik (Kronologisk logg)</span>
+          </h4>
+          <div id="loc-modal-history-list" class="space-y-2.5">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- MODAL D: HISTORY ITEM FULL DETAIL VIEW -->
+  <div id="history-detail-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[90vh] flex flex-col animate-slide-up overflow-hidden">
+      <div class="bg-ale-900 text-white px-5 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-ale-700 flex items-center justify-center">
+            <i data-lucide="file-check-2" class="w-5 h-5 text-ale-300"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base sm:text-lg leading-tight">Loggdetaljer</h3>
+            <p id="hist-detail-id" class="text-xs text-ale-200">Arkiverad uppgift</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeHistoryDetailModal()" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div id="history-detail-body" class="p-5 overflow-y-auto space-y-4 flex-1">
+        <!-- Populated by JS -->
+      </div>
+
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <button type="button" id="hist-detail-delete-btn" class="touch-btn px-4 rounded-xl text-red-600 hover:bg-red-50 font-bold text-xs sm:text-sm flex items-center gap-1.5 transition">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+          <span>Radera loggpost</span>
+        </button>
+        <button type="button" onclick="closeHistoryDetailModal()" class="touch-btn px-6 rounded-xl bg-ale-800 hover:bg-ale-900 text-white font-extrabold text-sm transition">
+          Stäng
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- MODAL E: FULLSCREEN PHOTO LIGHTBOX -->
+  <div id="lightbox-modal" onclick="closeLightbox()" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-xs flex flex-col items-center justify-center p-4">
+    <button type="button" onclick="closeLightbox()" class="absolute top-4 right-4 w-12 h-12 rounded-2xl bg-white/15 hover:bg-white/25 text-white flex items-center justify-center">
+      <i data-lucide="x" class="w-6 h-6"></i>
+    </button>
+    <img id="lightbox-img" src="" alt="Förstorad bild" class="max-w-full max-h-[82vh] rounded-2xl shadow-2xl object-contain border border-white/15" onclick="event.stopPropagation()" />
+    <p id="lightbox-caption" class="text-white/90 text-sm font-semibold mt-3 text-center max-w-md"></p>
+  </div>
+
+
+  <!-- MODAL F: CUSTOM CONFIRMATION DIALOG (NO NATIVE CONFIRM/ALERT) -->
+  <div id="confirm-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 animate-fade-in">
+      <div class="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center mb-4">
+        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+      </div>
+      <h3 id="confirm-title" class="text-lg font-extrabold text-slate-900 mb-1">Är du säker?</h3>
+      <p id="confirm-message" class="text-sm text-slate-600 mb-6">Denna åtgärd går inte att ångra.</p>
+      <div class="flex gap-2.5">
+        <button type="button" onclick="closeConfirmModal()" class="touch-btn flex-1 rounded-xl border border-slate-300 font-bold text-sm text-slate-700 hover:bg-slate-50">Avbryt</button>
+        <button type="button" id="confirm-action-btn" class="touch-btn flex-1 rounded-xl bg-red-600 hover:bg-red-700 text-white font-extrabold text-sm">Bekräfta</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast-container" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none flex flex-col items-center gap-2 w-full max-w-sm px-4"></div>
+
+
+  <!-- ==========================================
+       7. APPLICATION JAVASCRIPT
+  =========================================== -->
+  <script>
+    // --- CONSTANTS & REGISTERS ---
+    const CORRECT_PIN = '1986';
+    const STORAGE_KEY = 'ale_banlogg_state_v2';
+    const SESSION_AUTH_KEY = 'ale_banlogg_unlocked';
+
+    // Fixed Locations Register
+    const LOCATIONS = [
+      { id: 'Alla hål (1–18)', label: 'Alla hål (1–18)', short: 'Alla 1–18', group: 'ALL_HOLES', icon: 'layers' },
+      ...Array.from({ length: 18 }, (_, i) => ({
+        id: `Hål ${i + 1}`,
+        label: `Hål ${i + 1}`,
+        short: `${i + 1}`,
+        holeNum: i + 1,
+        group: 'HOLES',
+        icon: 'flag'
+      })),
+      { id: 'Driving Range', label: 'Driving Range', short: 'Range', group: 'AREAS', icon: 'target' },
+      { id: 'Övningsgreen: Humlegården', label: 'Övningsgreen: Humlegården', short: 'Humlegården', group: 'AREAS', icon: 'sprout' },
+      { id: 'Övningsgreen: Puttinggreen', label: 'Övningsgreen: Puttinggreen', short: 'Puttinggreen', group: 'AREAS', icon: 'circle-dot' },
+      { id: 'Övningsbunker', label: 'Övningsbunker', short: 'Övningsbunker', group: 'AREAS', icon: 'mountain-snow' },
+      { id: 'Korthålsbana', label: 'Korthålsbana', short: 'Korthålsbana', group: 'AREAS', icon: 'compass' },
+      { id: 'Verkstad', label: 'Verkstad', short: 'Verkstad', group: 'AREAS', icon: 'wrench' }
+    ];
+
+    // Predefined Work Types with Icons and Colors
+    const WORK_TYPES = [
+      { id: 'Klippning green', label: 'Klippning green', icon: 'scissors', badgeCls: 'bg-emerald-100 text-emerald-900 border-emerald-300' },
+      { id: 'Klippning fairway', label: 'Klippning fairway', icon: 'tractor', badgeCls: 'bg-green-100 text-green-900 border-green-300' },
+      { id: 'Klippning tee / foregreen', label: 'Klippning tee / foregreen', icon: 'minimize-2', badgeCls: 'bg-teal-100 text-teal-900 border-teal-300' },
+      { id: 'Klippning ruff', label: 'Klippning ruff', icon: 'trees', badgeCls: 'bg-lime-100 text-lime-900 border-lime-300' },
+      { id: 'Dammkanter', label: 'Dammkanter', icon: 'waves', badgeCls: 'bg-cyan-100 text-cyan-900 border-cyan-300' },
+      { id: 'Luftning', label: 'Luftning', icon: 'sparkles', badgeCls: 'bg-amber-100 text-amber-900 border-amber-300' },
+      { id: 'Dressning', label: 'Dressning', icon: 'layers', badgeCls: 'bg-yellow-100 text-yellow-900 border-yellow-300' },
+      { id: 'Hålning', label: 'Hålning', icon: 'flag', badgeCls: 'bg-indigo-100 text-indigo-900 border-indigo-300' },
+      { id: 'Bunkrar', label: 'Bunkrar', icon: 'sun', badgeCls: 'bg-orange-100 text-orange-900 border-orange-300' },
+      { id: 'Bevattning', label: 'Bevattning', icon: 'droplets', badgeCls: 'bg-sky-100 text-sky-900 border-sky-300' },
+      { id: 'Maskinservice', label: 'Maskinservice', icon: 'wrench', badgeCls: 'bg-slate-200 text-slate-900 border-slate-400' },
+      { id: 'Övrigt', label: 'Övrigt', icon: 'more-horizontal', badgeCls: 'bg-purple-100 text-purple-900 border-purple-300' }
+    ];
+
+    const DEFAULT_PROFILES = [
+      'Joel',
+      'Anders Svensson',
+      'Mikael Lind',
+      'Klara Nilsson',
+      'Erik Berg'
+    ];
+
+    // --- RUNTIME STATE ---
+    let appState = {
+      profiles: [],
+      currentUser: 'Joel',
+      tasks: [],
+      history: []
+    };
+
+    let currentPinInput = '';
+    let activeTab = 'todo';
+    let todoSelectedType = 'ALL';
+    let courseHoleFilter = 'ALL'; // ALL, FRONT9, BACK9
+
+    // Modal state holders
+    let completingTaskId = null;
+    let selectedCompletePerformers = [];
+    let completeModalPhotos = [];
+
+    let editingJobId = null;
+    let jobModalLocation = 'Hål 1';
+    let jobModalLocationGroup = 'HOLES';
+    let jobModalWorkType = 'Klippning green';
+    let jobModalPriority = 'Normal';
+    let jobModalPhotos = [];
+    let jobModalDirectMode = false;
+
+    let currentOpenLocationId = null;
+
+    // --- GENERATE REALISTIC FIELD DEMO PHOTOS (CANVAS DATA URLS) ---
+    function generateFieldPhoto(sceneType, labelText) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 480;
+      canvas.height = 300;
+      const ctx = canvas.getContext('2d');
+
+      if (sceneType === 'sprinkler') {
+        // Sky & turf
+        const grad = ctx.createLinearGradient(0, 0, 0, 300);
+        grad.addColorStop(0, '#bae6fd');
+        grad.addColorStop(0.45, '#e0f2fe');
+        grad.addColorStop(0.45, '#15803d');
+        grad.addColorStop(1, '#064e3b');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 480, 300);
+
+        // Bunker sand shape
+        ctx.fillStyle = '#fde68a';
+        ctx.beginPath();
+        ctx.ellipse(360, 210, 95, 38, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Water puddle & geyser spray
+        ctx.fillStyle = '#0284c7';
+        ctx.beginPath();
+        ctx.ellipse(210, 230, 65, 22, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+        ctx.lineWidth = 4;
+        for (let i = -3; i <= 3; i++) {
+          ctx.beginPath();
+          ctx.moveTo(210, 225);
+          ctx.quadraticCurveTo(210 + i * 25, 110, 210 + i * 45, 220);
+          ctx.stroke();
+        }
+      } else if (sceneType === 'pond') {
+        // Pond & reeds
+        const grad = ctx.createLinearGradient(0, 0, 0, 300);
+        grad.addColorStop(0, '#d1fae5');
+        grad.addColorStop(0.35, '#10b981');
+        grad.addColorStop(0.55, '#0369a1');
+        grad.addColorStop(1, '#0c4a6e');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 480, 300);
+
+        // Tall grass / reeds along edge
+        ctx.strokeStyle = '#065f46';
+        ctx.lineWidth = 3;
+        for (let x = 30; x < 450; x += 14) {
+          ctx.beginPath();
+          ctx.moveTo(x, 175);
+          ctx.lineTo(x + (x % 3 === 0 ? 8 : -6), 115 - (x % 25));
+          ctx.stroke();
+        }
+      } else {
+        // Freshly striped golf green
+        for (let i = 0; i < 12; i++) {
+          ctx.fillStyle = i % 2 === 0 ? '#16a34a' : '#15803d';
+          ctx.fillRect(i * 40, 0, 40, 300);
+        }
+        // Hole & Flagstick
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.ellipse(240, 210, 12, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#fef08a';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(240, 210);
+        ctx.lineTo(240, 60);
+        ctx.stroke();
+        ctx.fillStyle = '#ef4444';
+        ctx.beginPath();
+        ctx.moveTo(240, 60);
+        ctx.lineTo(300, 80);
+        ctx.lineTo(240, 100);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // Label overlay bar at bottom
+      ctx.fillStyle = 'rgba(2, 44, 34, 0.82)';
+      ctx.fillRect(0, 252, 480, 48);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 16px Inter, sans-serif';
+      ctx.fillText('📷 ' + labelText, 16, 282);
+
+      return canvas.toDataURL('image/jpeg', 0.8);
+    }
+
+    // --- INITIALIZE DEFAULT DEMO DATA ---
+    function createInitialDemoData() {
+      const now = Date.now();
+      const hour = 3600 * 1000;
+      const day = 24 * hour;
+
+      const photoSprinkler = generateFieldPhoto('sprinkler', 'Hål 7 – Läckande sprinkler vid greenbunker');
+      const photoPond = generateFieldPhoto('pond', 'Hål 4 – Dammkant mot fairway');
+      const photoGreen = generateFieldPhoto('green', 'Hål 1 – Nyligen klippt green (3.5 mm)');
+
+      const tasks = [
+        {
+          id: 'task-101',
+          title: 'Läckande sprinkler vid höger greenbunker',
+          location: 'Hål 7',
+          workType: 'Bevattning',
+          priority: 'Brådskande',
+          createdBy: 'Anders Svensson',
+          createdAt: now - (1.5 * hour),
+          comment: 'Sprinklerhuvudet står och läcker vatten ner i bunkern. Stäng ventil 7B och byt packning/munstycke innan lunch.',
+          photos: [photoSprinkler]
+        },
+        {
+          id: 'task-102',
+          title: 'Trimma dammkanter och rensa utlopp',
+          location: 'Hål 4',
+          workType: 'Dammkanter',
+          priority: 'Brådskande',
+          createdBy: 'Joel Klerfors',
+          createdAt: now - (3 * hour),
+          comment: 'Högt gräs längs hela vänstra dammkanten + lite vass i utloppet. Ta med röjsåg och kratta.',
+          photos: [photoPond]
+        },
+        {
+          id: 'task-103',
+          title: 'Ny hålning inför helgens tävling',
+          location: 'Alla hål (1–18)',
+          workType: 'Hålning',
+          priority: 'Normal',
+          createdBy: 'Joel Klerfors',
+          createdAt: now - (4 * hour),
+          comment: 'Sätt helgpinnar (zon 2 & 3). Kontrollera att alla hålkoppar är vitmålade i kanten.',
+          photos: []
+        },
+        {
+          id: 'task-104',
+          title: 'Lätt toppdressning av greener',
+          location: 'Övningsgreen: Humlegården',
+          workType: 'Dressning',
+          priority: 'Normal',
+          createdBy: 'Klara Nilsson',
+          createdAt: now - (5.5 * hour),
+          comment: 'Lägg en tunn giva sand och borsta in direkt efter klippning.',
+          photos: []
+        },
+        {
+          id: 'task-105',
+          title: 'Slipa aggregat & kontrollera hydraulslang på Toro 5410',
+          location: 'Verkstad',
+          workType: 'Maskinservice',
+          priority: 'Normal',
+          createdBy: 'Mikael Lind',
+          createdAt: now - (18 * hour),
+          comment: 'Vänster framaggregat tuggar lite ojämnt. Kontrollera understål och justera till 12 mm.',
+          photos: []
+        },
+        {
+          id: 'task-106',
+          title: 'Fyll på sand och kantskära övningsbunkern',
+          location: 'Övningsbunker',
+          workType: 'Bunkrar',
+          priority: 'Normal',
+          createdBy: 'Erik Berg',
+          createdAt: now - (22 * hour),
+          comment: 'Kanten mot chipp-ytan behöver skäras ren och bunkern krattas igenom.',
+          photos: []
+        },
+        {
+          id: 'task-107',
+          title: 'Klippning tee & foregreen inför morgondagen',
+          location: 'Hål 12',
+          workType: 'Klippning tee / foregreen',
+          priority: 'Normal',
+          createdBy: 'Anders Svensson',
+          createdAt: now - (26 * hour),
+          comment: 'Tee 58 och foregreen missades igår p.g.a. banarbete.',
+          photos: []
+        }
+      ];
+
+      const history = [
+        {
+          id: 'hist-201',
+          title: 'Morgonklippning green (Alla 18 hål)',
+          location: 'Alla hål (1–18)',
+          workType: 'Klippning green',
+          priority: 'Normal',
+          createdBy: 'Joel Klerfors',
+          createdAt: now - (5 * hour),
+          completedAt: now - (2 * hour),
+          performedBy: ['Joel Klerfors', 'Klara Nilsson'],
+          creatorComment: 'Daglig morgonklippning samt daggvältning.',
+          performerComment: 'Klippt på 3.5 mm. Fina och jämna greener hela vägen runt!',
+          photos: [photoGreen]
+        },
+        {
+          id: 'hist-202',
+          title: 'Klippning green på Puttinggreen',
+          location: 'Övningsgreen: Puttinggreen',
+          workType: 'Klippning green',
+          priority: 'Normal',
+          createdBy: 'Klara Nilsson',
+          createdAt: now - (4.5 * hour),
+          completedAt: now - (1.8 * hour),
+          performedBy: ['Klara Nilsson'],
+          creatorComment: 'Samma klipphöjd som banans greener.',
+          performerComment: 'Klippt på 3.5 mm samt flyttat två övningshål.',
+          photos: []
+        },
+        {
+          id: 'hist-203',
+          title: 'Bunkerräfsning & kontroll av krattor',
+          location: 'Alla hål (1–18)',
+          workType: 'Bunkrar',
+          priority: 'Normal',
+          createdBy: 'Anders Svensson',
+          createdAt: now - (27 * hour),
+          completedAt: now - (23 * hour),
+          performedBy: ['Erik Berg'],
+          creatorComment: 'Kör bunkerkrattan i alla greenbunkrar.',
+          performerComment: 'Alla bunkrar maskinräfsade. Ersatte trasig kratta på Hål 9.',
+          photos: []
+        },
+        {
+          id: 'hist-204',
+          title: 'Klippning fairway Hål 1–9',
+          location: 'Hål 4',
+          workType: 'Klippning fairway',
+          priority: 'Normal',
+          createdBy: 'Joel Klerfors',
+          createdAt: now - (29 * hour),
+          completedAt: now - (25 * hour),
+          performedBy: ['Mikael Lind'],
+          creatorComment: 'Kör korsmönster på 12 mm.',
+          performerComment: 'Klippt enligt plan på 12 mm. Lite blött i svackan på hål 4 men gick bra.',
+          photos: []
+        },
+        {
+          id: 'hist-205',
+          title: 'Dammkanter trimmade runt green',
+          location: 'Hål 18',
+          workType: 'Dammkanter',
+          priority: 'Normal',
+          createdBy: 'Joel Klerfors',
+          createdAt: now - (2 * day),
+          completedAt: now - (2 * day) + (3 * hour),
+          performedBy: ['Anders Svensson', 'Erik Berg'],
+          creatorComment: 'Trimma stensättningen och kanten mot publikytan.',
+          performerComment: 'Trimmat och blåst rent på gångvägen. Damm tömd på skräp.',
+          photos: []
+        },
+        {
+          id: 'hist-206',
+          title: 'Djupluftning med Verti-Drain',
+          location: 'Övningsgreen: Puttinggreen',
+          workType: 'Luftning',
+          priority: 'Normal',
+          createdBy: 'Joel Klerfors',
+          createdAt: now - (3 * day),
+          completedAt: now - (3 * day) + (4 * hour),
+          performedBy: ['Joel Klerfors', 'Mikael Lind'],
+          creatorComment: '8 mm solida pinnar för syresättning.',
+          performerComment: 'Luftat på 15 cm djup och vältat efteråt.',
+          photos: []
+        },
+        {
+          id: 'hist-207',
+          title: 'Klippning och bollplockning inför helg',
+          location: 'Driving Range',
+          workType: 'Klippning fairway',
+          priority: 'Normal',
+          createdBy: 'Anders Svensson',
+          createdAt: now - (3 * day),
+          completedAt: now - (3 * day) + (2 * hour),
+          performedBy: ['Erik Berg'],
+          creatorComment: 'Töm hela fältet på bollar tidigt och klipp.',
+          performerComment: 'Plockat ca 8 000 bollar och klippt hela landningsytan.',
+          photos: []
+        },
+        {
+          id: 'hist-208',
+          title: 'Hålning & byte av slitna flaggor',
+          location: 'Alla hål (1–18)',
+          workType: 'Hålning',
+          priority: 'Normal',
+          createdBy: 'Joel Klerfors',
+          createdAt: now - (4 * day),
+          completedAt: now - (4 * day) + (2.5 * hour),
+          performedBy: ['Klara Nilsson'],
+          creatorComment: 'Sätt nya hål samt byt flagga på hål 6 och 14.',
+          performerComment: 'Ny flaggplacering satt på alla 18 hål. Nya flaggor på 6 och 14.',
+          photos: []
+        },
+        {
+          id: 'hist-209',
+          title: 'Dammkanter vid tee och utslag',
+          location: 'Hål 4',
+          workType: 'Dammkanter',
+          priority: 'Normal',
+          createdBy: 'Anders Svensson',
+          createdAt: now - (5 * day),
+          completedAt: now - (5 * day) + (2 * hour),
+          performedBy: ['Anders Svensson'],
+          creatorComment: 'Trimma kanten vid främre dammen.',
+          performerComment: 'Främre dammkanten vid utslaget klar.',
+          photos: []
+        },
+        {
+          id: 'hist-210',
+          title: 'Olje- och filterbyte på greenklippare',
+          location: 'Verkstad',
+          workType: 'Maskinservice',
+          priority: 'Normal',
+          createdBy: 'Mikael Lind',
+          createdAt: now - (5 * day),
+          completedAt: now - (5 * day) + (3 * hour),
+          performedBy: ['Mikael Lind'],
+          creatorComment: '250-timmarsservice på Greensmaster.',
+          performerComment: 'Motorolja, filter och tändstift bytta. Maskin rengjord & kontrollerad.',
+          photos: []
+        },
+        {
+          id: 'hist-211',
+          title: 'Klippning korthålsbana (Tee, Green & Fairway)',
+          location: 'Korthålsbana',
+          workType: 'Klippning green',
+          priority: 'Normal',
+          createdBy: 'Joel Klerfors',
+          createdAt: now - (1 * day) - (4 * hour),
+          completedAt: now - (1 * day) - (2 * hour),
+          performedBy: ['Klara Nilsson'],
+          creatorComment: 'Gör korthålsbanan redo för juniorträningen.',
+          performerComment: 'Alla 6 hålen på korthålsbanan klippta och putsade.',
+          photos: []
+        },
+        {
+          id: 'hist-212',
+          title: 'Klippning semiruff och ruffkanter',
+          location: 'Hål 9',
+          workType: 'Klippning ruff',
+          priority: 'Normal',
+          createdBy: 'Anders Svensson',
+          createdAt: now - (2 * day),
+          completedAt: now - (2 * day) + (1 * hour),
+          performedBy: ['Erik Berg'],
+          creatorComment: 'Bredda första klippningen vid dogleg.',
+          performerComment: 'Klippt på 38 mm enligt plan.',
+          photos: []
+        }
+      ];
+
+      return {
+        profiles: [...DEFAULT_PROFILES],
+        currentUser: 'Joel',
+        tasks,
+        history
+      };
+    }
+
+    // --- STORAGE HELPERS ---
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && Array.isArray(parsed.tasks) && Array.isArray(parsed.history)) {
+            appState = parsed;
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('Kunde inte läsa localStorage, laddar standarddata.', e);
+      }
+      appState = createInitialDemoData();
+      saveState();
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      } catch (e) {
+        showToast('Lagringsutrymmet är fullt (t.ex. för många stora bilder).', 'error');
+      }
+    }
+
+    // --- AUTHENTICATION & PIN LOGIC ---
+    function initAuth() {
+      const isUnlocked = sessionStorage.getItem(SESSION_AUTH_KEY) === 'true';
+      const overlay = document.getElementById('auth-overlay');
+      if (isUnlocked && appState.currentUser) {
+        overlay.classList.add('hidden');
+      } else {
+        overlay.classList.remove('hidden');
+        showPinView();
+      }
+      renderProfileSelectionList();
+      updateHeaderProfile();
+    }
+
+    function showPinView() {
+      currentPinInput = '';
+      updatePinDots();
+      document.getElementById('pin-view').classList.remove('hidden');
+      document.getElementById('profile-view').classList.add('hidden');
+      const statusText = document.getElementById('pin-status-text');
+      if (statusText) statusText.classList.add('hidden');
+    }
+
+    function pressPin(digit) {
+      if (currentPinInput.length >= 4) return;
+      currentPinInput += digit;
+      updatePinDots();
+
+      if (currentPinInput.length === 4) {
+        setTimeout(validatePin, 120);
+      }
+    }
+
+    function backspacePin() {
+      currentPinInput = currentPinInput.slice(0, -1);
+      updatePinDots();
+    }
+
+    function clearPin() {
+      currentPinInput = '';
+      updatePinDots();
+    }
+
+    function updatePinDots(state = 'normal') {
+      const dots = document.querySelectorAll('#pin-dots .pin-dot');
+      dots.forEach((dot, idx) => {
+        dot.className = 'pin-dot w-5 h-5 rounded-full border-2 transition-all duration-150 ';
+        if (state === 'error') {
+          dot.className += 'border-red-400 bg-red-500 scale-110';
+        } else if (state === 'success') {
+          dot.className += 'border-ale-300 bg-ale-400 scale-110';
+        } else if (idx < currentPinInput.length) {
+          dot.className += 'border-ale-400 bg-ale-400 scale-105';
+        } else {
+          dot.className += 'border-ale-400/60 bg-transparent';
+        }
+      });
+    }
+
+    function validatePin() {
+      const statusText = document.getElementById('pin-status-text');
+      const dotsContainer = document.getElementById('pin-dots');
+      statusText.classList.remove('hidden');
+
+      if (currentPinInput === CORRECT_PIN) {
+        updatePinDots('success');
+        statusText.textContent = 'PIN-kod godkänd!';
+        statusText.className = 'text-center text-xs text-ale-300 font-bold mb-4';
+        setTimeout(() => {
+          document.getElementById('pin-view').classList.add('hidden');
+          document.getElementById('profile-view').classList.remove('hidden');
+          renderProfileSelectionList();
+        }, 250);
+      } else {
+        updatePinDots('error');
+        dotsContainer.classList.add('animate-shake');
+        statusText.textContent = 'Fel PIN-kod. Försök igen.';
+        statusText.className = 'text-center text-xs text-red-300 font-bold mb-4';
+        setTimeout(() => {
+          dotsContainer.classList.remove('animate-shake');
+          currentPinInput = '';
+          updatePinDots();
+        }, 500);
+      }
+    }
+
+    // Physical keyboard support for PIN screen
+    window.addEventListener('keydown', (e) => {
+      const overlay = document.getElementById('auth-overlay');
+      const pinView = document.getElementById('pin-view');
+      if (!overlay.classList.contains('hidden') && !pinView.classList.contains('hidden')) {
+        if (e.key >= '0' && e.key <= '9') {
+          pressPin(e.key);
+        } else if (e.key === 'Backspace') {
+          backspacePin();
+        } else if (e.key === 'Escape') {
+          clearPin();
+        }
+      }
+    });
+
+    function renderProfileSelectionList() {
+      const container = document.getElementById('profile-list-container');
+      container.innerHTML = appState.profiles.map(name => {
+        const initials = getInitials(name);
+        const isCurrent = name === appState.currentUser;
+        return `
+          <button type="button" onclick="selectProfile('${escapeHtml(name)}')" class="w-full touch-btn p-3.5 rounded-2xl border-2 ${isCurrent ? 'border-ale-600 bg-ale-50/70' : 'border-slate-200 hover:border-ale-500 bg-white'} flex items-center justify-between transition group">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl ${isCurrent ? 'bg-ale-700 text-white' : 'bg-ale-100 text-ale-900'} font-extrabold text-sm flex items-center justify-center">
+                ${initials}
+              </div>
+              <div class="text-left">
+                <p class="font-extrabold text-slate-900 text-base group-hover:text-ale-800">${escapeHtml(name)}</p>
+                <p class="text-xs text-slate-500 font-medium">Greenkeeper • Ale GK</p>
+              </div>
+            </div>
+            <div class="w-8 h-8 rounded-full ${isCurrent ? 'bg-ale-600 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-ale-100 group-hover:text-ale-700'} flex items-center justify-center">
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </div>
+          </button>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function toggleNewPersonInput() {
+      const box = document.getElementById('new-person-box');
+      const input = document.getElementById('new-person-input');
+      box.classList.toggle('hidden');
+      if (!box.classList.contains('hidden')) {
+        input.focus();
+      }
+    }
+
+    function addNewProfile() {
+      const input = document.getElementById('new-person-input');
+      const name = input.value.trim();
+      if (!name) {
+        showToast('Skriv in ett namn först.', 'error');
+        return;
+      }
+      if (!appState.profiles.includes(name)) {
+        appState.profiles.push(name);
+      }
+      input.value = '';
+      document.getElementById('new-person-box').classList.add('hidden');
+      selectProfile(name);
+    }
+
+    function selectProfile(name) {
+      appState.currentUser = name;
+      saveState();
+      sessionStorage.setItem(SESSION_AUTH_KEY, 'true');
+      document.getElementById('auth-overlay').classList.add('hidden');
+      updateHeaderProfile();
+      populateFilterDropdowns();
+      renderAll();
+      showToast(`Inloggad som ${name}`, 'success');
+    }
+
+    function switchUserPrompt() {
+      closeProfileMenu();
+      document.getElementById('auth-overlay').classList.remove('hidden');
+      document.getElementById('pin-view').classList.add('hidden');
+      document.getElementById('profile-view').classList.remove('hidden');
+      renderProfileSelectionList();
+    }
+
+    function lockApp() {
+      closeProfileMenu();
+      sessionStorage.removeItem(SESSION_AUTH_KEY);
+      document.getElementById('auth-overlay').classList.remove('hidden');
+      showPinView();
+    }
+
+    function updateHeaderProfile() {
+      const name = appState.currentUser || 'Joel';
+      document.getElementById('header-avatar').textContent = getInitials(name);
+      
+      const usernameEl = document.getElementById('header-username');
+      if (usernameEl) usernameEl.textContent = getShortName(name);
+      
+      document.getElementById('dropdown-fullname').textContent = name;
+    }
+
+    function toggleProfileMenu() {
+      const menu = document.getElementById('profile-dropdown');
+      menu.classList.toggle('hidden');
+    }
+
+    function closeProfileMenu() {
+      document.getElementById('profile-dropdown').classList.add('hidden');
+    }
+
+    // Close profile dropdown when clicking outside
+    window.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('profile-dropdown');
+      if (!dropdown.classList.contains('hidden') && !e.target.closest('.relative')) {
+        dropdown.classList.add('hidden');
+      }
+    });
+
+    // --- UTILITIES ---
+    function getInitials(name) {
+      if (!name) return 'GK';
+      const parts = name.trim().split(/\s+/);
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    function getShortName(name) {
+      if (!name) return '';
+      const parts = name.trim().split(/\s+/);
+      if (parts.length === 1) return parts[0];
+      return `${parts[0]} ${parts[parts.length - 1][0]}.`;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function getWorkTypeMeta(typeId) {
+      return WORK_TYPES.find(w => w.id === typeId) || WORK_TYPES[WORK_TYPES.length - 1];
+    }
+
+    function formatRelativeTime(timestamp, includeClock = true) {
+      if (!timestamp) return '';
+      const now = new Date();
+      const date = new Date(timestamp);
+      const diffMs = now - date;
+      const diffHours = diffMs / (1000 * 60 * 60);
+
+      const timeStr = date.toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' });
+
+      const isToday = now.toDateString() === date.toDateString();
+      const yesterday = new Date(now);
+      yesterday.setDate(now.getDate() - 1);
+      const isYesterday = yesterday.toDateString() === date.toDateString();
+
+      if (isToday) {
+        return includeClock ? `Idag ${timeStr}` : 'Idag';
+      }
+      if (isYesterday) {
+        return includeClock ? `Igår ${timeStr}` : 'Igår';
+      }
+      const diffDays = Math.floor(diffHours / 24);
+      if (diffDays < 7) {
+        return includeClock ? `${diffDays} dagar sedan (${timeStr})` : `${diffDays} dagar sedan`;
+      }
+      const dateFormatted = date.toLocaleDateString('sv-SE', { day: 'numeric', month: 'short' });
+      return includeClock ? `${dateFormatted} ${timeStr}` : dateFormatted;
+    }
+
+    function formatFullDateTime(timestamp) {
+      if (!timestamp) return '-';
+      const d = new Date(timestamp);
+      return d.toLocaleDateString('sv-SE', {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const bg = type === 'error' ? 'bg-red-600' : 'bg-ale-900';
+      const icon = type === 'error' ? 'alert-circle' : 'check-circle-2';
+      toast.className = `${bg} text-white px-4 py-3 rounded-2xl shadow-xl border border-white/15 flex items-center gap-2.5 text-xs sm:text-sm font-bold animate-fade-in pointer-events-auto`;
+      toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 text-ale-300 shrink-0"></i><span>${escapeHtml(message)}</span>`;
+      container.appendChild(toast);
+      lucide.createIcons();
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.25s ease';
+        setTimeout(() => toast.remove(), 250);
+      }, 2800);
+    }
+
+    // --- NAVIGATION & TAB SWITCHING ---
+    function switchTab(tabId) {
+      activeTab = tabId;
+      ['todo', 'course', 'history'].forEach(t => {
+        const sec = document.getElementById(`tab-${t}`);
+        if (t === tabId) {
+          sec.classList.remove('hidden');
+        } else {
+          sec.classList.add('hidden');
+        }
+
+        // Universal bottom nav styling
+        const mobBtn = document.getElementById(`mob-tab-${t}`);
+        const mobInd = document.getElementById(`mob-ind-${t}`);
+        if (t === tabId) {
+          mobBtn.className = 'flex flex-col items-center justify-center gap-1 relative font-extrabold transition text-ale-800 bg-ale-50/40';
+          mobInd.classList.remove('hidden');
+        } else {
+          mobBtn.className = 'flex flex-col items-center justify-center gap-1 relative font-semibold transition text-slate-500 hover:text-slate-800';
+          mobInd.classList.add('hidden');
+        }
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      renderAll();
+    }
+
+    // --- POPULATE FILTER DROPDOWNS ---
+    function populateFilterDropdowns() {
+      // Todo Location Filter
+      const todoLocSelect = document.getElementById('todo-location-filter');
+      const currentTodoLoc = todoLocSelect.value || 'ALL';
+      todoLocSelect.innerHTML = `<option value="ALL">Alla platser & hål</option>` +
+        LOCATIONS.map(l => `<option value="${escapeHtml(l.id)}">${escapeHtml(l.label)}</option>`).join('');
+      todoLocSelect.value = currentTodoLoc;
+
+      // History WorkType Filter
+      const histTypeSelect = document.getElementById('history-type-filter');
+      const currentHistType = histTypeSelect.value || 'ALL';
+      histTypeSelect.innerHTML = `<option value="ALL">Alla arbetstyper</option>` +
+        WORK_TYPES.map(w => `<option value="${escapeHtml(w.id)}">${escapeHtml(w.label)}</option>`).join('');
+      histTypeSelect.value = currentHistType;
+
+      // History Location Filter
+      const histLocSelect = document.getElementById('history-location-filter');
+      const currentHistLoc = histLocSelect.value || 'ALL';
+      histLocSelect.innerHTML = `<option value="ALL">Alla platser</option>` +
+        LOCATIONS.map(l => `<option value="${escapeHtml(l.id)}">${escapeHtml(l.label)}</option>`).join('');
+      histLocSelect.value = currentHistLoc;
+
+      // History Person Filter
+      const histPersonSelect = document.getElementById('history-person-filter');
+      const currentHistPerson = histPersonSelect.value || 'ALL';
+      histPersonSelect.innerHTML = `<option value="ALL">Alla i teamet</option>` +
+        appState.profiles.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');
+      histPersonSelect.value = currentHistPerson;
+    }
+
+    // --- RENDER MASTER ---
+    function renderAll() {
+      updateHeaderCounters();
+      renderTodoTab();
+      renderCourseTab();
+      renderHistoryTab();
+      if (currentOpenLocationId) {
+        renderLocationModalContent(currentOpenLocationId);
+      }
+      lucide.createIcons();
+    }
+
+    function updateHeaderCounters() {
+      const totalActive = appState.tasks.length;
+      document.getElementById('mob-badge-todo').textContent = totalActive;
+      document.getElementById('todo-count-pill').textContent = `${totalActive} aktiva`;
+    }
+
+    // ==========================================
+    // TAB 1: ATT GÖRA RENDERING
+    // ==========================================
+    function renderTodoTab() {
+      // 1. Render Quick Filter Chips
+      const chipsContainer = document.getElementById('todo-type-chips');
+      const urgentTotal = appState.tasks.filter(t => t.priority === 'Brådskande').length;
+
+      let chipsHtml = `
+        <button type="button" onclick="setTodoTypeFilter('ALL')" class="shrink-0 px-3.5 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 border ${todoSelectedType === 'ALL' ? 'bg-ale-800 text-white border-ale-800 shadow-xs' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'}">
+          <span>Alla</span>
+          <span class="px-1.5 py-0.2 rounded-full text-[11px] ${todoSelectedType === 'ALL' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'}">${appState.tasks.length}</span>
+        </button>
+        <button type="button" onclick="setTodoTypeFilter('URGENT')" class="shrink-0 px-3.5 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 border ${todoSelectedType === 'URGENT' ? 'bg-red-600 text-white border-red-600 shadow-xs' : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'}">
+          <i data-lucide="flame" class="w-3.5 h-3.5 fill-current"></i>
+          <span>Brådskande (${urgentTotal})</span>
+        </button>
+      `;
+
+      WORK_TYPES.forEach(wt => {
+        const count = appState.tasks.filter(t => t.workType === wt.id).length;
+        const active = todoSelectedType === wt.id;
+        chipsHtml += `
+          <button type="button" onclick="setTodoTypeFilter('${escapeHtml(wt.id)}')" class="shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border ${active ? 'bg-ale-800 text-white border-ale-800 shadow-xs' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'}">
+            <i data-lucide="${wt.icon}" class="w-3.5 h-3.5"></i>
+            <span>${escapeHtml(wt.label)}</span>
+            ${count > 0 ? `<span class="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${active ? 'bg-white/20 text-white' : 'bg-ale-100 text-ale-900'}">${count}</span>` : ''}
+          </button>
+        `;
+      });
+      chipsContainer.innerHTML = chipsHtml;
+
+      // 2. Filter and Sort Tasks (Urgent always on top, then newest)
+      const locFilter = document.getElementById('todo-location-filter').value || 'ALL';
+      let filtered = appState.tasks.filter(task => {
+        if (todoSelectedType === 'URGENT' && task.priority !== 'Brådskande') return false;
+        if (todoSelectedType !== 'ALL' && todoSelectedType !== 'URGENT' && task.workType !== todoSelectedType) return false;
+        if (locFilter !== 'ALL' && task.location !== locFilter) return false;
+        return true;
+      });
+
+      filtered.sort((a, b) => {
+        const aUrg = a.priority === 'Brådskande' ? 1 : 0;
+        const bUrg = b.priority === 'Brådskande' ? 1 : 0;
+        if (aUrg !== bUrg) return bUrg - aUrg;
+        return b.createdAt - a.createdAt;
+      });
+
+      const listContainer = document.getElementById('todo-list-container');
+      if (filtered.length === 0) {
+        listContainer.innerHTML = `
+          <div class="bg-white rounded-3xl p-8 text-center border border-slate-200 shadow-xs">
+            <div class="w-14 h-14 rounded-2xl bg-ale-50 text-ale-700 flex items-center justify-center mx-auto mb-3">
+              <i data-lucide="Sparkles" class="w-7 h-7"></i>
+            </div>
+            <h3 class="text-base font-extrabold text-slate-900">Inga väntande uppgifter här!</h3>
+            <p class="text-xs text-slate-500 mt-1 max-w-xs mx-auto">Alla uppgifter för valt filter är klara, eller så kan du lägga till ett nytt arbete.</p>
+            <button type="button" onclick="openJobModal()" class="mt-4 touch-btn px-5 py-2.5 rounded-xl bg-ale-700 hover:bg-ale-800 text-white font-extrabold text-xs inline-flex items-center gap-2">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Skapa nytt arbete</span>
+            </button>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      listContainer.innerHTML = filtered.map(task => renderTaskCardHtml(task)).join('');
+      lucide.createIcons();
+    }
+
+    function renderTaskCardHtml(task) {
+      const wt = getWorkTypeMeta(task.workType);
+      const isUrgent = task.priority === 'Brådskande';
+      const borderCls = isUrgent ? 'border-l-8 border-l-red-500 border-red-200 bg-white' : 'border-l-8 border-l-ale-600 border-slate-200 bg-white';
+
+      const photosHtml = (task.photos && task.photos.length > 0) ? `
+        <div class="flex flex-wrap gap-2 mt-3">
+          ${task.photos.map((src, idx) => `
+            <button type="button" onclick="openLightbox('${src}', '${escapeHtml(task.title)}')" class="relative group overflow-hidden rounded-xl border border-slate-200 w-24 h-16 bg-slate-100 shrink-0">
+              <img src="${src}" alt="Uppgiftsbild ${idx + 1}" class="w-full h-full object-cover group-hover:scale-105 transition" />
+              <span class="absolute bottom-1 right-1 bg-black/60 text-white p-1 rounded-md">
+                <i data-lucide="zoom-in" class="w-3 h-3"></i>
+              </span>
+            </button>
+          `).join('')}
+        </div>
+      ` : '';
+
+      return `
+        <article class="rounded-2xl border ${borderCls} p-4 sm:p-5 shadow-sm hover:shadow-md transition">
+          <!-- Top badges row -->
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <!-- Clickable Location Badge -->
+              <button type="button" onclick="openLocationModal('${escapeHtml(task.location)}')" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-ale-900 hover:bg-ale-800 text-white text-xs font-extrabold transition shadow-2xs">
+                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-ale-400"></i>
+                <span>${escapeHtml(task.location)}</span>
+              </button>
+
+              <!-- Work Type Badge -->
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-extrabold border ${wt.badgeCls}">
+                <i data-lucide="${wt.icon}" class="w-3.5 h-3.5"></i>
+                <span>${escapeHtml(wt.label)}</span>
+              </span>
+            </div>
+
+            <!-- Priority Badge -->
+            ${isUrgent ? `
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-100 text-red-800 border border-red-300 text-xs font-extrabold">
+                <i data-lucide="flame" class="w-3.5 h-3.5 text-red-600 fill-current"></i>
+                <span>Brådskande</span>
+              </span>
+            ` : `
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">
+                <span>Normal</span>
+              </span>
+            `}
+          </div>
+
+          <!-- Title & Instruction -->
+          <h3 class="text-base sm:text-lg font-extrabold text-slate-900 leading-snug">${escapeHtml(task.title)}</h3>
+          ${task.comment ? `<p class="text-sm text-slate-700 mt-1.5 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-200/70">${escapeHtml(task.comment)}</p>` : ''}
+
+          <!-- Photos if any -->
+          ${photosHtml}
+
+          <!-- Meta & Action Row -->
+          <div class="mt-4 pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="text-xs text-slate-500 font-medium flex items-center gap-1.5">
+              <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400"></i>
+              <span>Skapad ${formatRelativeTime(task.createdAt)} av <strong class="text-slate-700">${escapeHtml(getShortName(task.createdBy))}</strong></span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="openJobModal('${task.id}')" class="touch-btn px-3.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 transition" title="Redigera uppgift">
+                <i data-lucide="pencil" class="w-4 h-4"></i>
+                <span>Redigera</span>
+              </button>
+              <button type="button" onclick="confirmDeleteTask('${task.id}')" class="touch-btn px-3 rounded-xl border border-red-200 hover:bg-red-50 text-red-600 font-bold text-xs flex items-center justify-center transition" title="Ta bort uppgift">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+              <button type="button" onclick="openCompleteModal('${task.id}')" class="touch-btn flex-1 sm:flex-initial px-5 rounded-xl bg-ale-700 hover:bg-ale-800 active:scale-95 text-white font-extrabold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 transition">
+                <i data-lucide="check-circle-2" class="w-4 h-4 stroke-[2.5]"></i>
+                <span>✓ Klarmarkera</span>
+              </button>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function setTodoTypeFilter(type) {
+      todoSelectedType = type;
+      renderTodoTab();
+    }
+
+    // ==========================================
+    // TAB 2: BANA (COURSE & AREAS OVERVIEW)
+    // ==========================================
+    function setCourseHoleFilter(filter) {
+      courseHoleFilter = filter;
+      ['ALL', 'FRONT9', 'BACK9'].forEach(f => {
+        const btn = document.getElementById(`hole-filter-${f}`);
+        if (f === filter) {
+          btn.className = 'px-3 py-1.5 rounded-lg text-xs font-extrabold transition bg-ale-800 text-white';
+        } else {
+          btn.className = 'px-3 py-1.5 rounded-lg text-xs font-extrabold transition text-slate-600 hover:bg-slate-100';
+        }
+      });
+      renderCourseTab();
+    }
+
+    function getTasksForLocation(locationId, includeAllHolesGeneral = false) {
+      return appState.tasks.filter(t => {
+        if (t.location === locationId) return true;
+        if (includeAllHolesGeneral && locationId.startsWith('Hål ') && t.location === 'Alla hål (1–18)') return true;
+        return false;
+      });
+    }
+
+    function getHistoryForLocation(locationId, includeAllHolesGeneral = true) {
+      return appState.history.filter(h => {
+        if (h.location === locationId) return true;
+        if (includeAllHolesGeneral && locationId.startsWith('Hål ') && h.location === 'Alla hål (1–18)') return true;
+        return false;
+      }).sort((a, b) => b.completedAt - a.completedAt);
+    }
+
+    function renderCourseTab() {
+      // 1. Render "Alla hål (1–18)" Banner Card
+      const allHolesTasks = getTasksForLocation('Alla hål (1–18)', false);
+      const allHolesUrgent = allHolesTasks.some(t => t.priority === 'Brådskande');
+      const allHolesHist = getHistoryForLocation('Alla hål (1–18)', false);
+      const latestAllHoles = allHolesHist[0];
+
+      document.getElementById('all-holes-card-container').innerHTML = `
+        <div onclick="openLocationModal('Alla hål (1–18)')" class="cursor-pointer bg-gradient-to-r from-ale-900 via-ale-800 to-ale-700 text-white rounded-2xl p-4 sm:p-5 shadow-md hover:shadow-lg transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-ale-600">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center shrink-0 border border-white/20">
+              <i data-lucide="layers" class="w-6 h-6 text-ale-300"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="font-extrabold text-base sm:text-lg">Alla hål (1–18) – Generell banstatus</h3>
+                ${allHolesTasks.length > 0 ? `
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold ${allHolesUrgent ? 'bg-red-500 text-white' : 'bg-ale-400 text-ale-950'}">
+                    ${allHolesTasks.length} aktiva jobb
+                  </span>
+                ` : ''}
+              </div>
+              <p class="text-xs text-ale-100/90 mt-0.5">
+                ${latestAllHoles ? `Senast: ${escapeHtml(latestAllHoles.workType)} (${formatRelativeTime(latestAllHoles.completedAt, false)})` : 'Tryck för att se eller skapa jobb som gäller hela 18-hålsbanan'}
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 self-end sm:self-center">
+            <span class="text-xs font-bold bg-white/15 hover:bg-white/25 px-3.5 py-2 rounded-xl flex items-center gap-1.5">
+              <span>Öppna översikt</span>
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </span>
+          </div>
+        </div>
+      `;
+
+      // 2. Render Holes 1-18 Grid
+      let holes = LOCATIONS.filter(l => l.group === 'HOLES');
+      if (courseHoleFilter === 'FRONT9') holes = holes.slice(0, 9);
+      if (courseHoleFilter === 'BACK9') holes = holes.slice(9, 18);
+
+      const holesContainer = document.getElementById('holes-grid-container');
+      holesContainer.innerHTML = holes.map(hole => {
+        const directTasks = getTasksForLocation(hole.id, false);
+        const hasUrgent = directTasks.some(t => t.priority === 'Brådskande');
+        const holeHistory = getHistoryForLocation(hole.id, true);
+        const lastLog = holeHistory[0];
+
+        let badgeHtml = '';
+        if (directTasks.length > 0) {
+          badgeHtml = `
+            <span class="px-2 py-0.5 rounded-full text-[11px] font-extrabold flex items-center gap-1 ${hasUrgent ? 'bg-red-600 text-white animate-pulse' : 'bg-amber-400 text-slate-950'}">
+              ${hasUrgent ? '<i data-lucide="flame" class="w-3 h-3 fill-current"></i>' : ''}
+              <span>${directTasks.length} jobb</span>
+            </span>
+          `;
+        } else {
+          badgeHtml = `
+            <span class="w-6 h-6 rounded-full bg-ale-50 text-ale-700 flex items-center justify-center">
+              <i data-lucide="check" class="w-3.5 h-3.5 stroke-[2.5]"></i>
+            </span>
+          `;
+        }
+
+        const borderClass = hasUrgent
+          ? 'border-2 border-red-500 bg-red-50/20'
+          : directTasks.length > 0
+            ? 'border-2 border-amber-400 bg-white'
+            : 'border border-slate-200/90 bg-white hover:border-ale-600';
+
+        return `
+          <button type="button" onclick="openLocationModal('${hole.id}')" class="text-left rounded-2xl p-3.5 shadow-xs hover:shadow-md active:scale-98 transition flex flex-col justify-between min-h-[108px] ${borderClass}">
+            <div class="flex items-start justify-between w-full gap-1">
+              <div class="flex items-baseline gap-1">
+                <span class="text-[11px] font-bold uppercase text-slate-400">Hål</span>
+                <span class="text-2xl font-extrabold text-ale-950 leading-none">${hole.holeNum}</span>
+              </div>
+              ${badgeHtml}
+            </div>
+
+            <div class="mt-3 pt-2 border-t border-slate-100 w-full">
+              ${directTasks.length > 0 ? `
+                <p class="text-[11px] font-bold ${hasUrgent ? 'text-red-700' : 'text-amber-900'} truncate">
+                  ⚡ ${escapeHtml(directTasks[0].workType)}
+                </p>
+              ` : lastLog ? `
+                <p class="text-[11px] text-slate-500 font-medium truncate">
+                  ✓ ${escapeHtml(lastLog.workType)}: <span class="font-bold text-slate-700">${formatRelativeTime(lastLog.completedAt, false)}</span>
+                </p>
+              ` : `
+                <p class="text-[11px] text-slate-400">Ingen logg ännu</p>
+              `}
+            </div>
+          </button>
+        `;
+      }).join('');
+
+      // 3. Render Practice Areas & Facility Grid
+      const areas = LOCATIONS.filter(l => l.group === 'AREAS');
+      const areasContainer = document.getElementById('areas-grid-container');
+      areasContainer.innerHTML = areas.map(area => {
+        const directTasks = getTasksForLocation(area.id, false);
+        const hasUrgent = directTasks.some(t => t.priority === 'Brådskande');
+        const areaHist = getHistoryForLocation(area.id, false);
+        const lastLog = areaHist[0];
+
+        const borderClass = hasUrgent
+          ? 'border-2 border-red-500 bg-white'
+          : directTasks.length > 0
+            ? 'border-2 border-amber-400 bg-white'
+            : 'border border-slate-200 bg-white hover:border-ale-600';
+
+        return `
+          <button type="button" onclick="openLocationModal('${escapeHtml(area.id)}')" class="text-left rounded-2xl p-4 shadow-xs hover:shadow-md active:scale-98 transition flex items-start justify-between gap-3 ${borderClass}">
+            <div class="flex items-start gap-3 min-w-0">
+              <div class="w-11 h-11 rounded-2xl bg-ale-50 text-ale-800 border border-ale-200 flex items-center justify-center shrink-0 mt-0.5">
+                <i data-lucide="${area.icon}" class="w-5 h-5"></i>
+              </div>
+              <div class="min-w-0">
+                <h4 class="font-extrabold text-sm sm:text-base text-slate-900 truncate">${escapeHtml(area.label)}</h4>
+                <p class="text-xs text-slate-500 mt-1 truncate">
+                  ${lastLog ? `Senast: <strong class="text-slate-700">${escapeHtml(lastLog.workType)}</strong> (${formatRelativeTime(lastLog.completedAt, false)})` : 'Ingen historik registrerad'}
+                </p>
+              </div>
+            </div>
+
+            <div class="shrink-0">
+              ${directTasks.length > 0 ? `
+                <span class="px-2.5 py-1 rounded-full text-xs font-extrabold ${hasUrgent ? 'bg-red-600 text-white' : 'bg-amber-400 text-slate-950'}">
+                  ${directTasks.length} aktiva
+                </span>
+              ` : `
+                <span class="w-8 h-8 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center">
+                  <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </span>
+              `}
+            </div>
+          </button>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // --- LOCATION DETAIL DRAWER / MODAL ---
+    function openLocationModal(locationId) {
+      currentOpenLocationId = locationId;
+      renderLocationModalContent(locationId);
+      document.getElementById('location-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeLocationModal() {
+      currentOpenLocationId = null;
+      document.getElementById('location-modal').classList.add('hidden');
+    }
+
+    function renderLocationModalContent(locationId) {
+      const locObj = LOCATIONS.find(l => l.id === locationId) || { id: locationId, label: locationId, short: '📍' };
+      document.getElementById('loc-modal-title').textContent = locObj.label;
+      document.getElementById('loc-modal-badge').innerHTML = locObj.holeNum
+        ? locObj.holeNum
+        : `<i data-lucide="${locObj.icon || 'map-pin'}" class="w-5 h-5 text-ale-300"></i>`;
+
+      const addBtn = document.getElementById('loc-modal-add-btn');
+      addBtn.onclick = () => {
+        openJobModal(null, locationId, false);
+      };
+
+      // 1. Active Tasks on this location (plus general 1-18 tasks if hole)
+      const activeTasks = getTasksForLocation(locationId, true);
+      const activeListEl = document.getElementById('loc-modal-active-list');
+      if (activeTasks.length === 0) {
+        activeListEl.innerHTML = `
+          <div class="bg-white rounded-2xl p-4 border border-slate-200 text-center">
+            <p class="text-xs font-bold text-slate-600">Inga väntande arbeten på ${escapeHtml(locObj.label)} just nu.</p>
+          </div>
+        `;
+      } else {
+        activeListEl.innerHTML = activeTasks.map(t => renderTaskCardHtml(t)).join('');
+      }
+
+      // 2. Latest Maintenance Summary Matrix
+      const locHistory = getHistoryForLocation(locationId, true);
+      const keyTypes = locObj.id === 'Verkstad'
+        ? ['Maskinservice', 'Övrigt']
+        : ['Klippning green', 'Klippning fairway', 'Dammkanter', 'Hålning', 'Bunkrar', 'Bevattning'];
+
+      const maintContainer = document.getElementById('loc-modal-last-maint');
+      maintContainer.innerHTML = keyTypes.map(typeId => {
+        const wt = getWorkTypeMeta(typeId);
+        const latestMatch = locHistory.find(h => h.workType === typeId);
+        return `
+          <div class="bg-white rounded-xl p-3 border border-slate-200/90 shadow-2xs">
+            <div class="flex items-center gap-1.5 text-xs font-extrabold text-slate-800 mb-1">
+              <i data-lucide="${wt.icon}" class="w-3.5 h-3.5 text-ale-700 shrink-0"></i>
+              <span class="truncate">${escapeHtml(wt.label)}</span>
+            </div>
+            ${latestMatch ? `
+              <p class="text-xs font-extrabold text-ale-800">${formatRelativeTime(latestMatch.completedAt)}</p>
+              <p class="text-[11px] text-slate-500 truncate">Av ${escapeHtml(latestMatch.performedBy.map(getShortName).join(', '))}</p>
+            ` : `
+              <p class="text-xs text-slate-400 font-medium">Ej loggat nyligen</p>
+            `}
+          </div>
+        `;
+      }).join('');
+
+      // 3. Chronological Location History
+      const histContainer = document.getElementById('loc-modal-history-list');
+      if (locHistory.length === 0) {
+        histContainer.innerHTML = `
+          <div class="bg-white rounded-2xl p-4 border border-slate-200 text-center">
+            <p class="text-xs text-slate-500">Ingen tidigare historik på denna plats.</p>
+          </div>
+        `;
+      } else {
+        histContainer.innerHTML = locHistory.map(h => renderHistoryCardHtml(h)).join('');
+      }
+    }
+
+    // ==========================================
+    // TAB 3: HISTORIK (COMPLETE LOGBOOK)
+    // ==========================================
+    function resetHistoryFilters() {
+      document.getElementById('history-search-input').value = '';
+      document.getElementById('history-type-filter').value = 'ALL';
+      document.getElementById('history-location-filter').value = 'ALL';
+      document.getElementById('history-person-filter').value = 'ALL';
+      renderHistoryTab();
+    }
+
+    function renderHistoryTab() {
+      const query = (document.getElementById('history-search-input').value || '').trim().toLowerCase();
+      const typeFilter = document.getElementById('history-type-filter').value || 'ALL';
+      const locFilter = document.getElementById('history-location-filter').value || 'ALL';
+      const personFilter = document.getElementById('history-person-filter').value || 'ALL';
+
+      const filtered = appState.history.filter(item => {
+        if (typeFilter !== 'ALL' && item.workType !== typeFilter) return false;
+        if (locFilter !== 'ALL') {
+          const matchesDirect = item.location === locFilter;
+          const matchesAllHoles = locFilter.startsWith('Hål ') && item.location === 'Alla hål (1–18)';
+          if (!matchesDirect && !matchesAllHoles) return false;
+        }
+        if (personFilter !== 'ALL' && !(item.performedBy || []).includes(personFilter)) return false;
+
+        if (query) {
+          const hay = [
+            item.title,
+            item.workType,
+            item.location,
+            item.creatorComment,
+            item.performerComment,
+            ...(item.performedBy || [])
+          ].join(' ').toLowerCase();
+          if (!hay.includes(query)) return false;
+        }
+        return true;
+      }).sort((a, b) => b.completedAt - a.completedAt);
+
+      document.getElementById('history-results-label').textContent =
+        `Visar ${filtered.length} genomförda arbeten`;
+
+      const container = document.getElementById('history-list-container');
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white rounded-3xl p-8 text-center border border-slate-200">
+            <i data-lucide="search-x" class="w-8 h-8 text-slate-400 mx-auto mb-2"></i>
+            <h3 class="text-base font-extrabold text-slate-800">Inga loggposter matchade dina filter</h3>
+            <p class="text-xs text-slate-500 mt-1">Prova att nollställa filtren eller sök på ett annat ord.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = filtered.map(item => renderHistoryCardHtml(item)).join('');
+      lucide.createIcons();
+    }
+
+    function renderHistoryCardHtml(item) {
+      const wt = getWorkTypeMeta(item.workType);
+      const performers = (item.performedBy || []).map(getShortName).join(', ');
+      const hasPhotos = item.photos && item.photos.length > 0;
+
+      return `
+        <div onclick="openHistoryDetailModal('${item.id}')" class="cursor-pointer bg-white hover:bg-ale-50/30 rounded-2xl p-4 border border-slate-200/90 shadow-2xs hover:shadow-md transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="space-y-1.5 min-w-0 flex-1">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-ale-900 text-white text-xs font-extrabold">
+                <i data-lucide="map-pin" class="w-3 h-3 text-ale-300"></i>
+                <span>${escapeHtml(item.location)}</span>
+              </span>
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-extrabold border ${wt.badgeCls}">
+                <i data-lucide="${wt.icon}" class="w-3 h-3"></i>
+                <span>${escapeHtml(wt.label)}</span>
+              </span>
+              ${hasPhotos ? `
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-bold">
+                  <i data-lucide="camera" class="w-3 h-3 text-ale-700"></i>
+                  <span>${item.photos.length}</span>
+                </span>
+              ` : ''}
+            </div>
+
+            <h4 class="font-extrabold text-sm sm:text-base text-slate-900 truncate">${escapeHtml(item.title)}</h4>
+
+            ${item.performerComment ? `
+              <p class="text-xs sm:text-sm text-slate-600 line-clamp-2">
+                <span class="font-semibold text-ale-800">Notering:</span> "${escapeHtml(item.performerComment)}"
+              </p>
+            ` : ''}
+          </div>
+
+          <div class="flex sm:flex-col items-center sm:items-end justify-between border-t sm:border-t-0 pt-2.5 sm:pt-0 border-slate-100 shrink-0 gap-1">
+            <span class="text-xs font-extrabold text-ale-900 bg-ale-50 px-2.5 py-1 rounded-lg border border-ale-200">
+              ${formatRelativeTime(item.completedAt)}
+            </span>
+            <span class="text-xs text-slate-500 font-semibold flex items-center gap-1">
+              <i data-lucide="user-check" class="w-3.5 h-3.5 text-ale-600"></i>
+              <span>${escapeHtml(performers)}</span>
+            </span>
+          </div>
+        </div>
+      `;
+    }
+
+    // --- HISTORY FULL DETAIL MODAL ---
+    function openHistoryDetailModal(histId) {
+      const item = appState.history.find(h => h.id === histId);
+      if (!item) return;
+
+      const wt = getWorkTypeMeta(item.workType);
+      document.getElementById('hist-detail-id').textContent = `${item.location} • ${formatRelativeTime(item.completedAt)}`;
+
+      const photosHtml = (item.photos && item.photos.length > 0) ? `
+        <div>
+          <p class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-2">Bifogade bilder</p>
+          <div class="grid grid-cols-2 gap-2.5">
+            ${item.photos.map(src => `
+              <img src="${src}" onclick="openLightbox('${src}', '${escapeHtml(item.title)}')" class="cursor-pointer w-full h-36 object-cover rounded-2xl border border-slate-200 hover:opacity-95 transition" alt="Loggbild" />
+            `).join('')}
+          </div>
+        </div>
+      ` : '';
+
+      document.getElementById('history-detail-body').innerHTML = `
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="closeHistoryDetailModal(); openLocationModal('${escapeHtml(item.location)}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-ale-900 text-white text-xs font-extrabold">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-ale-300"></i>
+            <span>${escapeHtml(item.location)}</span>
+          </button>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold border ${wt.badgeCls}">
+            <i data-lucide="${wt.icon}" class="w-3.5 h-3.5"></i>
+            <span>${escapeHtml(wt.label)}</span>
+          </span>
+        </div>
+
+        <h4 class="text-lg font-extrabold text-slate-900">${escapeHtml(item.title)}</h4>
+
+        <div class="bg-ale-50/70 border border-ale-200 rounded-2xl p-4 space-y-2">
+          <p class="text-xs font-extrabold uppercase tracking-wider text-ale-900">Utförarkommentar</p>
+          <p class="text-sm font-medium text-slate-800">${escapeHtml(item.performerComment || 'Ingen kommentar angiven.')}</p>
+        </div>
+
+        ${item.creatorComment ? `
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-1">
+            <p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Ursprunglig instruktion</p>
+            <p class="text-xs text-slate-700">${escapeHtml(item.creatorComment)}</p>
+          </div>
+        ` : ''}
+
+        ${photosHtml}
+
+        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-xs space-y-2">
+          <div class="flex justify-between">
+            <span class="text-slate-500 font-semibold">Utförd av:</span>
+            <span class="font-extrabold text-slate-900">${escapeHtml((item.performedBy || []).join(', '))}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500 font-semibold">Slutförd tidpunkt:</span>
+            <span class="font-bold text-slate-800">${formatFullDateTime(item.completedAt)}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500 font-semibold">Skapad av:</span>
+            <span class="font-bold text-slate-800">${escapeHtml(item.createdBy || '-')} (${formatFullDateTime(item.createdAt)})</span>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('hist-detail-delete-btn').onclick = () => {
+        confirmDeleteHistory(item.id);
+      };
+
+      document.getElementById('history-detail-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeHistoryDetailModal() {
+      document.getElementById('history-detail-modal').classList.add('hidden');
+    }
+
+    // ==========================================
+    // COMPLETE TASK FLOW ("KLARMARKERA")
+    // ==========================================
+    function openCompleteModal(taskId) {
+      const task = appState.tasks.find(t => t.id === taskId);
+      if (!task) return;
+
+      completingTaskId = taskId;
+      selectedCompletePerformers = [appState.currentUser];
+      completeModalPhotos = [...(task.photos || [])];
+
+      document.getElementById('complete-modal-subtitle').textContent = `${task.location} • ${task.title}`;
+      document.getElementById('complete-comment-input').value = '';
+
+      renderCompletePerformersChips();
+      renderPhotoPreviews('complete');
+
+      document.getElementById('complete-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeCompleteModal() {
+      completingTaskId = null;
+      document.getElementById('complete-modal').classList.add('hidden');
+    }
+
+    function renderCompletePerformersChips() {
+      const container = document.getElementById('complete-performers-chips');
+      container.innerHTML = appState.profiles.map(person => {
+        const selected = selectedCompletePerformers.includes(person);
+        return `
+          <button type="button" onclick="toggleCompletePerformer('${escapeHtml(person)}')" class="touch-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-extrabold border-2 transition flex items-center gap-1.5 ${selected ? 'bg-ale-800 text-white border-ale-800 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:border-ale-400'}">
+            <i data-lucide="${selected ? 'check-square' : 'square'}" class="w-4 h-4 ${selected ? 'text-ale-300' : 'text-slate-400'}"></i>
+            <span>${escapeHtml(person)}</span>
+          </button>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function toggleCompletePerformer(person) {
+      if (selectedCompletePerformers.includes(person)) {
+        if (selectedCompletePerformers.length > 1) {
+          selectedCompletePerformers = selectedCompletePerformers.filter(p => p !== person);
+        }
+      } else {
+        selectedCompletePerformers.push(person);
+      }
+      renderCompletePerformersChips();
+    }
+
+    function appendQuickComment(text) {
+      const input = document.getElementById('complete-comment-input');
+      input.value = input.value ? `${input.value.trim()} ${text}` : text;
+      input.focus();
+    }
+
+    function submitCompleteTask() {
+      const taskIndex = appState.tasks.findIndex(t => t.id === completingTaskId);
+      if (taskIndex === -1) return;
+
+      const task = appState.tasks[taskIndex];
+      const comment = document.getElementById('complete-comment-input').value.trim();
+
+      const historyItem = {
+        id: 'hist-' + Date.now(),
+        title: task.title,
+        location: task.location,
+        workType: task.workType,
+        priority: task.priority,
+        createdBy: task.createdBy,
+        createdAt: task.createdAt,
+        completedAt: Date.now(),
+        performedBy: selectedCompletePerformers.length > 0 ? [...selectedCompletePerformers] : [appState.currentUser],
+        creatorComment: task.comment || '',
+        performerComment: comment || 'Utfört enligt plan.',
+        photos: [...completeModalPhotos]
+      };
+
+      appState.tasks.splice(taskIndex, 1);
+      appState.history.unshift(historyItem);
+      saveState();
+
+      closeCompleteModal();
+      renderAll();
+      showToast(`Klarmarkerat: ${task.title} (${task.location})`);
+    }
+
+    // ==========================================
+    // CREATE / EDIT / DIRECT-LOG JOB MODAL
+    // ==========================================
+    function openJobModal(editTaskId = null, preselectedLocation = null, directLogMode = false) {
+      closeProfileMenu();
+      editingJobId = editTaskId;
+      jobModalDirectMode = directLogMode;
+
+      const titleInput = document.getElementById('job-title-input');
+      const commentInput = document.getElementById('job-comment-input');
+      const directBtn = document.getElementById('job-direct-log-btn');
+      const prioSection = document.getElementById('job-priority-section');
+
+      if (editTaskId) {
+        const task = appState.tasks.find(t => t.id === editTaskId);
+        if (!task) return;
+        document.getElementById('job-modal-title').textContent = 'Redigera arbete';
+        document.getElementById('job-modal-desc').textContent = 'Uppdatera uppgiftens detaljer';
+        document.getElementById('job-save-btn-text').textContent = 'Spara ändringar';
+        directBtn.classList.add('hidden');
+        prioSection.classList.remove('hidden');
+
+        jobModalLocation = task.location;
+        jobModalWorkType = task.workType;
+        jobModalPriority = task.priority;
+        jobModalPhotos = [...(task.photos || [])];
+        titleInput.value = task.title;
+        commentInput.value = task.comment || '';
+      } else {
+        jobModalLocation = preselectedLocation || 'Hål 1';
+        jobModalWorkType = 'Klippning green';
+        jobModalPriority = 'Normal';
+        jobModalPhotos = [];
+        titleInput.value = '';
+        commentInput.value = '';
+
+        if (directLogMode) {
+          document.getElementById('job-modal-title').textContent = 'Direktlogga utfört arbete';
+          document.getElementById('job-modal-desc').textContent = 'Läggs direkt i Historik som utfört av dig nu';
+          document.getElementById('job-comment-label').textContent = '5. Utförarkommentar (Vad gjordes?)';
+          document.getElementById('job-save-btn-text').textContent = 'Spara direkt till historik';
+          directBtn.classList.add('hidden');
+          prioSection.classList.add('hidden');
+        } else {
+          document.getElementById('job-modal-title').textContent = 'Skapa nytt arbete';
+          document.getElementById('job-modal-desc').textContent = 'Schemalägg i "Att göra" eller direktlogga';
+          document.getElementById('job-comment-label').textContent = '5. Instruktion / kommentar (Vem eller hur?)';
+          document.getElementById('job-save-btn-text').textContent = 'Lägg till i Att göra';
+          directBtn.classList.remove('hidden');
+          prioSection.classList.remove('hidden');
+        }
+        fillSuggestedTitle(true);
+      }
+
+      // Determine location group tab
+      const locMeta = LOCATIONS.find(l => l.id === jobModalLocation);
+      jobModalLocationGroup = locMeta ? locMeta.group : 'HOLES';
+
+      renderJobLocationSelectors();
+      renderJobWorkTypeGrid();
+      setJobPriority(jobModalPriority);
+      renderPhotoPreviews('job');
+
+      document.getElementById('job-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeJobModal() {
+      editingJobId = null;
+      document.getElementById('job-modal').classList.add('hidden');
+    }
+
+    function setJobLocationGroup(group) {
+      jobModalLocationGroup = group;
+      if (group === 'ALL_HOLES') {
+        selectJobLocation('Alla hål (1–18)');
+      } else if (group === 'HOLES' && !jobModalLocation.startsWith('Hål ')) {
+        selectJobLocation('Hål 1');
+      } else if (group === 'AREAS' && (jobModalLocation.startsWith('Hål ') || jobModalLocation === 'Alla hål (1–18)')) {
+        selectJobLocation('Driving Range');
+      }
+      renderJobLocationSelectors();
+    }
+
+    function selectJobLocation(locId) {
+      jobModalLocation = locId;
+      document.getElementById('job-selected-location-badge').textContent = locId;
+      if (!editingJobId) fillSuggestedTitle(false);
+      renderJobLocationSelectors();
+    }
+
+    function renderJobLocationSelectors() {
+      ['HOLES', 'ALL_HOLES', 'AREAS'].forEach(grp => {
+        const btn = document.getElementById(`loc-grp-${grp}`);
+        if (grp === jobModalLocationGroup) {
+          btn.className = 'py-2 rounded-lg text-xs font-extrabold transition bg-ale-800 text-white shadow-xs';
+        } else {
+          btn.className = 'py-2 rounded-lg text-xs font-extrabold transition text-slate-600 hover:bg-slate-200/60';
+        }
+      });
+
+      const holesGrid = document.getElementById('job-loc-holes-grid');
+      const areasGrid = document.getElementById('job-loc-areas-grid');
+
+      if (jobModalLocationGroup === 'HOLES') {
+        holesGrid.classList.remove('hidden');
+        areasGrid.classList.add('hidden');
+        const holes = LOCATIONS.filter(l => l.group === 'HOLES');
+        holesGrid.innerHTML = holes.map(h => {
+          const active = jobModalLocation === h.id;
+          return `
+            <button type="button" onclick="selectJobLocation('${h.id}')" class="h-11 rounded-xl font-extrabold text-sm border transition ${active ? 'bg-ale-800 text-white border-ale-800 shadow-xs scale-105' : 'bg-slate-50 text-slate-800 border-slate-200 hover:bg-ale-50'}">
+              ${h.holeNum}
+            </button>
+          `;
+        }).join('');
+      } else if (jobModalLocationGroup === 'AREAS') {
+        holesGrid.classList.add('hidden');
+        areasGrid.classList.remove('hidden');
+        const areas = LOCATIONS.filter(l => l.group === 'AREAS');
+        areasGrid.innerHTML = areas.map(a => {
+          const active = jobModalLocation === a.id;
+          return `
+            <button type="button" onclick="selectJobLocation('${escapeHtml(a.id)}')" class="touch-btn px-3.5 py-2.5 rounded-xl font-bold text-xs sm:text-sm border text-left flex items-center gap-2 transition ${active ? 'bg-ale-800 text-white border-ale-800 shadow-xs' : 'bg-slate-50 text-slate-800 border-slate-200 hover:bg-ale-50'}">
+              <i data-lucide="${a.icon}" class="w-4 h-4 shrink-0"></i>
+              <span class="truncate">${escapeHtml(a.label)}</span>
+            </button>
+          `;
+        }).join('');
+      } else {
+        holesGrid.classList.add('hidden');
+        areasGrid.classList.add('hidden');
+      }
+
+      document.getElementById('job-selected-location-badge').textContent = jobModalLocation;
+      lucide.createIcons();
+    }
+
+    function renderJobWorkTypeGrid() {
+      const container = document.getElementById('job-worktype-grid');
+      container.innerHTML = WORK_TYPES.map(wt => {
+        const active = jobModalWorkType === wt.id;
+        return `
+          <button type="button" onclick="selectJobWorkType('${escapeHtml(wt.id)}')" class="touch-btn p-2.5 rounded-xl border-2 text-left flex items-center gap-2 font-bold text-xs transition ${active ? 'border-ale-700 bg-ale-50 text-ale-950 shadow-2xs' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'}">
+            <div class="w-7 h-7 rounded-lg ${active ? 'bg-ale-700 text-white' : 'bg-slate-100 text-slate-600'} flex items-center justify-center shrink-0">
+              <i data-lucide="${wt.icon}" class="w-4 h-4"></i>
+            </div>
+            <span class="leading-tight">${escapeHtml(wt.label)}</span>
+          </button>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function selectJobWorkType(typeId) {
+      jobModalWorkType = typeId;
+      if (!editingJobId) fillSuggestedTitle(false);
+      renderJobWorkTypeGrid();
+    }
+
+    function setJobPriority(prio) {
+      jobModalPriority = prio;
+      const normBtn = document.getElementById('prio-btn-Normal');
+      const urgBtn = document.getElementById('prio-btn-Urgent');
+
+      if (prio === 'Brådskande') {
+        urgBtn.className = 'touch-btn rounded-2xl border-2 border-red-600 bg-red-600 text-white px-4 py-3 font-extrabold text-sm flex items-center justify-center gap-2 shadow-sm transition';
+        normBtn.className = 'touch-btn rounded-2xl border-2 border-slate-200 bg-white text-slate-600 px-4 py-3 font-bold text-sm flex items-center justify-center gap-2 transition';
+      } else {
+        normBtn.className = 'touch-btn rounded-2xl border-2 border-ale-700 bg-ale-50 text-ale-900 px-4 py-3 font-extrabold text-sm flex items-center justify-center gap-2 shadow-sm transition';
+        urgBtn.className = 'touch-btn rounded-2xl border-2 border-slate-200 bg-white text-slate-600 px-4 py-3 font-bold text-sm flex items-center justify-center gap-2 transition';
+      }
+    }
+
+    function fillSuggestedTitle(force = false) {
+      const input = document.getElementById('job-title-input');
+      const currentVal = input.value.trim();
+      const isAutoLooking = !currentVal || WORK_TYPES.some(w => currentVal.startsWith(w.label));
+      if (force || isAutoLooking) {
+        input.value = `${jobModalWorkType} – ${jobModalLocation}`;
+      }
+    }
+
+    function saveJob(forceDirectToHistory = false) {
+      const titleInput = document.getElementById('job-title-input');
+      const commentInput = document.getElementById('job-comment-input');
+
+      const title = titleInput.value.trim() || `${jobModalWorkType} – ${jobModalLocation}`;
+      const comment = commentInput.value.trim();
+
+      if (jobModalDirectMode || forceDirectToHistory) {
+        const newHist = {
+          id: 'hist-' + Date.now(),
+          title,
+          location: jobModalLocation,
+          workType: jobModalWorkType,
+          priority: jobModalPriority,
+          createdBy: appState.currentUser,
+          createdAt: Date.now(),
+          completedAt: Date.now(),
+          performedBy: [appState.currentUser],
+          creatorComment: '',
+          performerComment: comment || 'Direktloggat i fält.',
+          photos: [...jobModalPhotos]
+        };
+        appState.history.unshift(newHist);
+        saveState();
+        closeJobModal();
+        renderAll();
+        showToast(`Direktloggat till historik: ${title}`);
+        return;
+      }
+
+      if (editingJobId) {
+        const idx = appState.tasks.findIndex(t => t.id === editingJobId);
+        if (idx !== -1) {
+          appState.tasks[idx] = {
+            ...appState.tasks[idx],
+            title,
+            location: jobModalLocation,
+            workType: jobModalWorkType,
+            priority: jobModalPriority,
+            comment,
+            photos: [...jobModalPhotos]
+          };
+          showToast('Uppgiften har uppdaterats');
+        }
+      } else {
+        const newTask = {
+          id: 'task-' + Date.now(),
+          title,
+          location: jobModalLocation,
+          workType: jobModalWorkType,
+          priority: jobModalPriority,
+          createdBy: appState.currentUser,
+          createdAt: Date.now(),
+          comment,
+          photos: [...jobModalPhotos]
+        };
+        appState.tasks.unshift(newTask);
+        showToast(`Lagt till i Att göra: ${title}`);
+      }
+
+      saveState();
+      closeJobModal();
+      renderAll();
+    }
+
+    // ==========================================
+    // PHOTO UPLOAD & CANVAS COMPRESSION
+    // ==========================================
+    function handlePhotoUpload(event, targetModal) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 800;
+          let w = img.width;
+          let h = img.height;
+          if (w > h && w > maxDim) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else if (h > maxDim) {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.72);
+
+          if (targetModal === 'complete') {
+            completeModalPhotos.push(compressedDataUrl);
+            renderPhotoPreviews('complete');
+          } else {
+            jobModalPhotos.push(compressedDataUrl);
+            renderPhotoPreviews('job');
+          }
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+      event.target.value = '';
+    }
+
+    function renderPhotoPreviews(targetModal) {
+      const list = targetModal === 'complete' ? completeModalPhotos : jobModalPhotos;
+      const containerId = targetModal === 'complete' ? 'complete-photos-preview' : 'job-photos-preview';
+      const container = document.getElementById(containerId);
+
+      container.innerHTML = list.map((src, idx) => `
+        <div class="relative w-20 h-20 rounded-xl overflow-hidden border border-slate-300 shadow-2xs group">
+          <img src="${src}" class="w-full h-full object-cover" alt="Förhandsvisning" />
+          <button type="button" onclick="removeUploadedPhoto('${targetModal}', ${idx})" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-600 text-white flex items-center justify-center shadow-md">
+            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function removeUploadedPhoto(targetModal, idx) {
+      if (targetModal === 'complete') {
+        completeModalPhotos.splice(idx, 1);
+        renderPhotoPreviews('complete');
+      } else {
+        jobModalPhotos.splice(idx, 1);
+        renderPhotoPreviews('job');
+      }
+    }
+
+    // --- LIGHTBOX ---
+    function openLightbox(src, caption = '') {
+      document.getElementById('lightbox-img').src = src;
+      document.getElementById('lightbox-caption').textContent = caption;
+      document.getElementById('lightbox-modal').classList.remove('hidden');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox-modal').classList.add('hidden');
+    }
+
+    // --- CONFIRMATION DIALOGS (NO NATIVE ALERT/CONFIRM) ---
+    function openConfirmModal(title, message, onConfirm) {
+      document.getElementById('confirm-title').textContent = title;
+      document.getElementById('confirm-message').textContent = message;
+      const btn = document.getElementById('confirm-action-btn');
+      btn.onclick = () => {
+        closeConfirmModal();
+        onConfirm();
+      };
+      document.getElementById('confirm-modal').classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirm-modal').classList.add('hidden');
+    }
+
+    function confirmDeleteTask(taskId) {
+      const task = appState.tasks.find(t => t.id === taskId);
+      if (!task) return;
+      openConfirmModal(
+        'Ta bort uppgift?',
+        `Vill du ta bort "${task.title}" (${task.location}) permanent?`,
+        () => {
+          appState.tasks = appState.tasks.filter(t => t.id !== taskId);
+          saveState();
+          renderAll();
+          showToast('Uppgiften togs bort');
+        }
+      );
+    }
+
+    function confirmDeleteHistory(histId) {
+      const item = appState.history.find(h => h.id === histId);
+      if (!item) return;
+      openConfirmModal(
+        'Radera loggpost?',
+        `Vill du ta bort "${item.title}" från historiken?`,
+        () => {
+          appState.history = appState.history.filter(h => h.id !== histId);
+          saveState();
+          closeHistoryDetailModal();
+          renderAll();
+          showToast('Loggposten raderades');
+        }
+      );
+    }
+
+    function confirmResetDemoData() {
+      closeProfileMenu();
+      openConfirmModal(
+        'Återställ demodata?',
+        'Detta återställer alla uppgifter, profiler och historik till Ale Banloggs ursprungliga exempeldata.',
+        () => {
+          appState = createInitialDemoData();
+          saveState();
+          populateFilterDropdowns();
+          updateHeaderProfile();
+          renderAll();
+          showToast('Demodata har återställts');
+        }
+      );
+    }
+
+    // --- INITIALIZE APP ON LOAD ---
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      populateFilterDropdowns();
+      initAuth();
+      renderAll();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
