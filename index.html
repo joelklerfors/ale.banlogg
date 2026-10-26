@@ -95,18 +95,18 @@
   <!-- ==========================================
        1. PIN LOCK & PROFILE OVERLAY SCREEN
   =========================================== -->
-  <div id="auth-overlay" class="fixed inset-0 z-50 bg-gradient-to-b from-ale-950 via-ale-900 to-ale-800 text-white flex flex-col justify-between p-4 sm:p-6 overflow-y-auto">
+  <div id="auth-overlay" class="fixed inset-0 z-50 bg-gradient-to-b from-ale-950 via-ale-900 to-ale-800 text-white flex flex-col justify-start p-4 sm:p-6 overflow-y-auto">
     
     <!-- Top Brand Header -->
-    <div class="text-center pt-8 sm:pt-16">
-      <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-ale-700/60 border border-ale-400/30 shadow-lg mb-4">
+    <div class="text-center pt-3 sm:pt-8">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-ale-700/60 border border-ale-400/30 shadow-lg mb-3">
         <i data-lucide="flag" class="w-10 h-10 text-ale-400"></i>
       </div>
       <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Ale Banlogg</h1>
     </div>
 
     <!-- Step A: PIN Pad View -->
-    <div id="pin-view" class="w-full max-w-sm mx-auto my-auto py-4">
+    <div id="pin-view" class="w-full max-w-sm mx-auto mt-3 sm:mt-5 mb-auto py-2">
       <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-3xl p-6 shadow-2xl">
         <h2 class="text-center text-lg font-bold text-white mb-6">Ange PIN-kod</h2>
         <p id="pin-status-text" class="hidden text-center text-xs mb-4"></p>
@@ -140,7 +140,7 @@
     </div>
 
     <!-- Step B: Profile Selection View -->
-    <div id="profile-view" class="hidden w-full max-w-md mx-auto my-auto py-4 animate-fade-in">
+    <div id="profile-view" class="hidden w-full max-w-md mx-auto mt-4 sm:mt-6 mb-auto py-2 animate-fade-in">
       <div class="bg-white text-slate-900 rounded-3xl p-5 sm:p-6 shadow-2xl">
         <div class="flex items-center justify-between mb-4">
           <div>
@@ -429,6 +429,73 @@
        6. MODALS & DRAWERS
   =========================================== -->
 
+  <!-- MODAL C: LOCATION DETAIL DRAWER / MODAL (FLIK 2: BANA) -->
+  <div id="location-modal" class="hidden fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-2xl rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[92vh] flex flex-col animate-slide-up overflow-hidden">
+      
+      <!-- Header -->
+      <div class="bg-ale-900 text-white px-5 py-4 flex items-center justify-between gap-2">
+        <div class="flex items-center gap-3 min-w-0">
+          <div id="loc-modal-badge" class="w-11 h-11 rounded-2xl bg-ale-700 border border-ale-400/30 flex items-center justify-center font-extrabold text-lg shrink-0">
+            4
+          </div>
+          <div class="truncate">
+            <h3 id="loc-modal-title" class="font-extrabold text-lg sm:text-xl leading-tight truncate">Hål 4</h3>
+            <p id="loc-modal-subtitle" class="text-xs text-ale-200">Områdesöversikt & underhållslogg</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <button type="button" id="loc-modal-add-btn" class="bg-ale-500 hover:bg-ale-400 text-ale-950 font-extrabold text-xs sm:text-sm px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 shadow-sm transition">
+            <i data-lucide="plus" class="w-4 h-4 stroke-[3]"></i>
+            <span>Lägg till jobb här</span>
+          </button>
+          <button type="button" onclick="closeLocationModal()" class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1 bg-ale-bg">
+        
+        <!-- 1. Active Tasks on this location -->
+        <div>
+          <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2.5 flex items-center gap-1.5">
+            <i data-lucide="clipboard-list" class="w-4 h-4 text-ale-700"></i>
+            <span>Aktiva uppgifter på platsen</span>
+          </h4>
+          <div id="loc-modal-active-list" class="space-y-2.5">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- 2. Latest Maintenance Summary Matrix -->
+        <div>
+          <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2.5 flex items-center gap-1.5">
+            <i data-lucide="clock" class="w-4 h-4 text-ale-700"></i>
+            <span>Senaste underhåll på platsen</span>
+          </h4>
+          <div id="loc-modal-last-maint" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- 3. Chronological Location History -->
+        <div>
+          <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2.5 flex items-center gap-1.5">
+            <i data-lucide="history" class="w-4 h-4 text-ale-700"></i>
+            <span>Platshistorik (Kronologisk logg)</span>
+          </h4>
+          <div id="loc-modal-history-list" class="space-y-2.5">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
   <!-- MODAL A: COMPLETE TASK ("KLARMARKERA") -->
   <div id="complete-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[92vh] flex flex-col animate-slide-up overflow-hidden">
@@ -460,20 +527,12 @@
           </div>
         </div>
 
-        <!-- Quick Comment Suggestions + Textarea -->
+        <!-- Textarea for Comment -->
         <div>
           <label for="complete-comment-input" class="block text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2">
             Utförarkommentar / Notering
           </label>
-          <!-- Glove-friendly quick chips -->
-          <div class="flex flex-wrap gap-1.5 mb-2.5">
-            <button type="button" onclick="appendQuickComment('Klippt på 3.5 mm.')" class="text-xs font-semibold bg-ale-50 hover:bg-ale-100 text-ale-900 border border-ale-200 px-2.5 py-1.5 rounded-lg transition">+ Klippt på 3.5 mm</button>
-            <button type="button" onclick="appendQuickComment('Utfört enligt plan utan anmärkning.')" class="text-xs font-semibold bg-ale-50 hover:bg-ale-100 text-ale-900 border border-ale-200 px-2.5 py-1.5 rounded-lg transition">+ Enligt plan</button>
-            <button type="button" onclick="appendQuickComment('Damm tömd på skräp & trimmad.')" class="text-xs font-semibold bg-ale-50 hover:bg-ale-100 text-ale-900 border border-ale-200 px-2.5 py-1.5 rounded-lg transition">+ Damm tömd på skräp</button>
-            <button type="button" onclick="appendQuickComment('Ny flaggplacering satt.')" class="text-xs font-semibold bg-ale-50 hover:bg-ale-100 text-ale-900 border border-ale-200 px-2.5 py-1.5 rounded-lg transition">+ Ny flaggplacering</button>
-            <button type="button" onclick="appendQuickComment('Maskin rengjord & kontrollerad.')" class="text-xs font-semibold bg-ale-50 hover:bg-ale-100 text-ale-900 border border-ale-200 px-2.5 py-1.5 rounded-lg transition">+ Maskin rengjord</button>
-          </div>
-          <textarea id="complete-comment-input" rows="3" placeholder="T.ex. Klippt på 3.5mm, damm 4 tömd på skräp..." class="w-full rounded-2xl border border-slate-300 p-3.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ale-600"></textarea>
+          <textarea id="complete-comment-input" rows="3" placeholder="Skriv en kommentar eller notering (valfritt)..." class="w-full rounded-2xl border border-slate-300 p-3.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ale-600"></textarea>
         </div>
 
         <!-- Photo Attachment -->
@@ -629,73 +688,6 @@
           <i data-lucide="check" class="w-5 h-5"></i>
           <span id="job-save-btn-text">Lägg till i Att göra</span>
         </button>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- MODAL C: LOCATION DETAIL DRAWER / MODAL (FLIK 2: BANA) -->
-  <div id="location-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white w-full max-w-2xl rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[92vh] flex flex-col animate-slide-up overflow-hidden">
-      
-      <!-- Header -->
-      <div class="bg-ale-900 text-white px-5 py-4 flex items-center justify-between gap-2">
-        <div class="flex items-center gap-3 min-w-0">
-          <div id="loc-modal-badge" class="w-11 h-11 rounded-2xl bg-ale-700 border border-ale-400/30 flex items-center justify-center font-extrabold text-lg shrink-0">
-            4
-          </div>
-          <div class="truncate">
-            <h3 id="loc-modal-title" class="font-extrabold text-lg sm:text-xl leading-tight truncate">Hål 4</h3>
-            <p id="loc-modal-subtitle" class="text-xs text-ale-200">Områdesöversikt & underhållslogg</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-2 shrink-0">
-          <button type="button" id="loc-modal-add-btn" class="bg-ale-500 hover:bg-ale-400 text-ale-950 font-extrabold text-xs sm:text-sm px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 shadow-sm transition">
-            <i data-lucide="plus" class="w-4 h-4 stroke-[3]"></i>
-            <span>Lägg till jobb här</span>
-          </button>
-          <button type="button" onclick="closeLocationModal()" class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center">
-            <i data-lucide="x" class="w-5 h-5"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Body -->
-      <div class="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1 bg-ale-bg">
-        
-        <!-- 1. Active Tasks on this location -->
-        <div>
-          <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2.5 flex items-center gap-1.5">
-            <i data-lucide="clipboard-list" class="w-4 h-4 text-ale-700"></i>
-            <span>Aktiva uppgifter på platsen</span>
-          </h4>
-          <div id="loc-modal-active-list" class="space-y-2.5">
-            <!-- Populated by JS -->
-          </div>
-        </div>
-
-        <!-- 2. Latest Maintenance Summary Matrix -->
-        <div>
-          <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2.5 flex items-center gap-1.5">
-            <i data-lucide="clock" class="w-4 h-4 text-ale-700"></i>
-            <span>Senaste underhåll på platsen</span>
-          </h4>
-          <div id="loc-modal-last-maint" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-            <!-- Populated by JS -->
-          </div>
-        </div>
-
-        <!-- 3. Chronological Location History -->
-        <div>
-          <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-2.5 flex items-center gap-1.5">
-            <i data-lucide="history" class="w-4 h-4 text-ale-700"></i>
-            <span>Platshistorik (Kronologisk logg)</span>
-          </h4>
-          <div id="loc-modal-history-list" class="space-y-2.5">
-            <!-- Populated by JS -->
-          </div>
-        </div>
-
       </div>
     </div>
   </div>
@@ -3235,8 +3227,3 @@
   </script>
 </body>
 </html>
-```eof
-
-Du kan kopiera hela innehållet här ovanför och spara i din `index.html`. 
-
-När du laddar upp detta på GitHub Pages så är appen nu en "multiplayer"-app där alla greenkeepers kan se och logga arbeten samtidigt!
