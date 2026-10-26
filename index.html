@@ -153,23 +153,9 @@
         </div>
 
         <!-- Profile List -->
-        <div id="profile-list-container" class="space-y-2.5 max-h-80 overflow-y-auto pr-1 mb-4">
+        <div id="profile-list-container" class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
           <!-- Populated by JS -->
         </div>
-
-        <!-- Add New Person Form Toggle -->
-        <div id="new-person-box" class="hidden mb-3 p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
-          <label for="new-person-input" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Namn på ny medarbetare</label>
-          <div class="flex gap-2">
-            <input id="new-person-input" type="text" placeholder="Förnamn Efternamn" class="flex-1 rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ale-600" />
-            <button type="button" onclick="addNewProfile()" class="bg-ale-700 hover:bg-ale-800 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition touch-btn">Spara</button>
-          </div>
-        </div>
-
-        <button type="button" id="toggle-new-person-btn" onclick="toggleNewPersonInput()" class="w-full touch-btn rounded-2xl border-2 border-dashed border-ale-600/40 hover:border-ale-600 bg-ale-50/50 hover:bg-ale-50 text-ale-800 font-bold text-sm flex items-center justify-center gap-2 transition py-3">
-          <i data-lucide="user-plus" class="w-5 h-5 text-ale-600"></i>
-          <span>+ Ny person</span>
-        </button>
       </div>
     </div>
 
@@ -196,33 +182,53 @@
       <div class="flex items-center gap-2 shrink-0">
         <!-- Profile Menu Button -->
         <div class="relative">
-          <button type="button" onclick="toggleProfileMenu()" class="h-9 w-9 sm:w-auto sm:px-3 rounded-xl bg-ale-800 hover:bg-ale-700 border border-ale-600/50 flex items-center justify-center gap-2 transition" title="Byt användare eller lås">
+          <button type="button" onclick="toggleProfileMenu()" class="h-9 w-9 sm:w-auto sm:px-3 rounded-xl bg-ale-800 hover:bg-ale-700 border border-ale-600/50 flex items-center justify-center gap-2 transition" title="Profil & Inställningar">
             <div id="header-avatar" class="w-6 h-6 rounded-full bg-ale-500 text-ale-950 font-extrabold text-xs flex items-center justify-center">
-              J
+              R
             </div>
-            <span id="header-username" class="hidden sm:block text-sm font-bold max-w-[130px] truncate">Joel</span>
+            <span id="header-username" class="hidden sm:block text-sm font-bold max-w-[130px] truncate">Rickard</span>
+            <i data-lucide="chevron-down" class="hidden sm:block w-3.5 h-3.5 text-ale-300"></i>
           </button>
 
           <!-- Dropdown Menu -->
           <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-64 bg-white text-slate-800 rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-fade-in">
             <div class="px-4 py-2.5 border-b border-slate-100">
               <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Inloggad greenkeeper</p>
-              <p id="dropdown-fullname" class="text-sm font-extrabold text-ale-900 truncate">Joel</p>
+              <p id="dropdown-fullname" class="text-sm font-extrabold text-ale-900 truncate">Rickard</p>
             </div>
-            <button type="button" onclick="switchUserPrompt()" class="w-full px-4 py-3 text-left text-sm font-semibold hover:bg-slate-50 flex items-center gap-3 text-slate-700">
+
+            <button type="button" onclick="switchUserPrompt()" class="w-full px-4 py-2.5 text-left text-sm font-semibold hover:bg-slate-50 flex items-center gap-3 text-slate-700">
               <i data-lucide="users" class="w-4 h-4 text-ale-700"></i>
               <span>Byt profil / användare</span>
             </button>
-            <button type="button" onclick="openJobModal(null, null, true)" class="w-full px-4 py-3 text-left text-sm font-semibold hover:bg-slate-50 flex items-center gap-3 text-slate-700">
+            <button type="button" onclick="openJobModal(null, null, true)" class="w-full px-4 py-2.5 text-left text-sm font-semibold hover:bg-slate-50 flex items-center gap-3 text-slate-700">
               <i data-lucide="check-circle-2" class="w-4 h-4 text-ale-700"></i>
               <span>Direktlogga utfört arbete</span>
             </button>
-            <button type="button" onclick="confirmResetDemoData()" class="w-full px-4 py-3 text-left text-sm font-semibold hover:bg-slate-50 flex items-center gap-3 text-slate-700">
-              <i data-lucide="rotate-ccw" class="w-4 h-4 text-amber-600"></i>
-              <span>Återställ demodata</span>
-            </button>
-            <div class="border-t border-slate-100 mt-1 pt-1">
-              <button type="button" onclick="lockApp()" class="w-full px-4 py-3 text-left text-sm font-bold hover:bg-red-50 flex items-center gap-3 text-red-600">
+
+            <!-- Redigera-menyer under profilen -->
+            <div class="border-t border-slate-100 my-1 pt-1">
+              <p class="px-4 py-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Administrera</p>
+              <button type="button" onclick="openAdminModal('staff')" class="w-full px-4 py-2.5 text-left text-sm font-semibold hover:bg-slate-50 flex items-center gap-3 text-slate-700">
+                <i data-lucide="user-cog" class="w-4 h-4 text-ale-700"></i>
+                <span>Redigera personalstyrka</span>
+              </button>
+              <button type="button" onclick="openAdminModal('worktypes')" class="w-full px-4 py-2.5 text-left text-sm font-semibold hover:bg-slate-50 flex items-center gap-3 text-slate-700">
+                <i data-lucide="tags" class="w-4 h-4 text-ale-700"></i>
+                <span>Redigera arbetstyper</span>
+              </button>
+              <button type="button" onclick="openAdminModal('locations')" class="w-full px-4 py-2.5 text-left text-sm font-semibold hover:bg-slate-50 flex items-center gap-3 text-slate-700">
+                <i data-lucide="map-pinned" class="w-4 h-4 text-ale-700"></i>
+                <span>Redigera platser</span>
+              </button>
+            </div>
+
+            <div class="border-t border-slate-100 my-1 pt-1">
+              <button type="button" onclick="confirmResetDemoData()" class="w-full px-4 py-2.5 text-left text-sm font-semibold hover:bg-slate-50 flex items-center gap-3 text-slate-700">
+                <i data-lucide="rotate-ccw" class="w-4 h-4 text-amber-600"></i>
+                <span>Återställ demodata</span>
+              </button>
+              <button type="button" onclick="lockApp()" class="w-full px-4 py-2.5 text-left text-sm font-bold hover:bg-red-50 flex items-center gap-3 text-red-600">
                 <i data-lucide="lock" class="w-4 h-4"></i>
                 <span>Lås med PIN-kod</span>
               </button>
@@ -277,7 +283,7 @@
     =========================================== -->
     <section id="tab-course" class="hidden space-y-6">
       
-      <!-- All Holes (1-18) General Banner Card -->
+      <!-- All Holes (1-18) Banner Card -->
       <div id="all-holes-card-container">
         <!-- Populated by JS -->
       </div>
@@ -304,7 +310,6 @@
             <i data-lucide="compass" class="w-5 h-5 text-ale-700"></i>
             <span>Övningsytor & Anläggning</span>
           </h2>
-          <p class="text-xs text-slate-500 font-medium">Driving Range, Humlegården, Puttinggreen, Bunkrar, Korthålsbana & Verkstad</p>
         </div>
 
         <div id="areas-grid-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -330,7 +335,7 @@
             </h2>
           </div>
           <button type="button" onclick="resetHistoryFilters()" class="text-xs font-bold text-ale-700 hover:text-ale-900 bg-ale-50 hover:bg-ale-100 px-3 py-2 rounded-xl transition flex items-center gap-1">
-            <i data-lucide="Filter-x" class="w-3.5 h-3.5"></i>
+            <i data-lucide="filter-x" class="w-3.5 h-3.5"></i>
             <span>Nollställ filter</span>
           </button>
         </div>
@@ -741,7 +746,7 @@
   </div>
 
 
-  <!-- MODAL F: CUSTOM CONFIRMATION DIALOG (NO NATIVE CONFIRM/ALERT) -->
+  <!-- MODAL F: CUSTOM CONFIRMATION DIALOG -->
   <div id="confirm-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 animate-fade-in">
       <div class="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center mb-4">
@@ -757,6 +762,105 @@
   </div>
 
 
+  <!-- MODAL G: PROFILE ADMIN MODAL (STAFF, WORK TYPES, LOCATIONS) -->
+  <div id="admin-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-xl rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[92vh] flex flex-col animate-slide-up overflow-hidden">
+      <!-- Header -->
+      <div class="bg-ale-900 text-white px-5 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-ale-700 flex items-center justify-center">
+            <i id="admin-modal-icon" data-lucide="settings" class="w-5 h-5 text-ale-300"></i>
+          </div>
+          <div>
+            <h3 id="admin-modal-title" class="font-extrabold text-base sm:text-lg leading-tight">Redigera</h3>
+            <p id="admin-modal-subtitle" class="text-xs text-ale-200">Hantera inställningar under din profil</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeAdminModal()" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Quick Switch Tabs inside Admin Modal -->
+      <div class="bg-slate-100 p-1.5 grid grid-cols-3 gap-1.5 border-b border-slate-200">
+        <button type="button" onclick="switchAdminSection('staff')" id="admin-tab-staff" class="py-2 rounded-xl text-xs font-extrabold transition">Personalstyrka</button>
+        <button type="button" onclick="switchAdminSection('worktypes')" id="admin-tab-worktypes" class="py-2 rounded-xl text-xs font-extrabold transition">Arbetstyper</button>
+        <button type="button" onclick="switchAdminSection('locations')" id="admin-tab-locations" class="py-2 rounded-xl text-xs font-extrabold transition">Platser</button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1">
+        
+        <!-- SECTION 1: PERSONALSTYRKA -->
+        <div id="admin-sec-staff" class="space-y-4">
+          <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+            <label for="admin-new-staff-input" class="block text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-1.5">Lägg till ny person i personalstyrkan</label>
+            <div class="flex gap-2">
+              <input id="admin-new-staff-input" type="text" placeholder="Namn på medarbetare..." onkeydown="if(event.key==='Enter') addAdminStaff()" class="flex-1 rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ale-600 bg-white" />
+              <button type="button" onclick="addAdminStaff()" class="touch-btn bg-ale-700 hover:bg-ale-800 text-white font-extrabold px-4 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition shrink-0">
+                <i data-lucide="user-plus" class="w-4 h-4"></i>
+                <span>Lägg till</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="admin-staff-list" class="space-y-2">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- SECTION 2: ARBETSTYPER -->
+        <div id="admin-sec-worktypes" class="hidden space-y-4">
+          <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+            <label for="admin-new-wt-input" class="block text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-1.5">Lägg till ny arbetstyp</label>
+            <div class="flex gap-2">
+              <input id="admin-new-wt-input" type="text" placeholder="T.ex. Vertikalskärning..." onkeydown="if(event.key==='Enter') addAdminWorkType()" class="flex-1 rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ale-600 bg-white" />
+              <button type="button" onclick="addAdminWorkType()" class="touch-btn bg-ale-700 hover:bg-ale-800 text-white font-extrabold px-4 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition shrink-0">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Lägg till</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="admin-worktypes-list" class="space-y-2">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- SECTION 3: PLATSER -->
+        <div id="admin-sec-locations" class="hidden space-y-4">
+          <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2.5">
+            <label for="admin-new-loc-input" class="block text-xs font-extrabold uppercase tracking-wider text-slate-600">Lägg till ny plats / yta</label>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <input id="admin-new-loc-input" type="text" placeholder="T.ex. Klubbhusområdet..." onkeydown="if(event.key==='Enter') addAdminLocation()" class="flex-1 rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ale-600 bg-white" />
+              <select id="admin-new-loc-group" class="rounded-xl border border-slate-300 px-3 py-2.5 text-xs sm:text-sm font-bold text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-ale-600">
+                <option value="AREAS">Övningsyta / Anläggning</option>
+                <option value="HOLES">Bana (Hål)</option>
+              </select>
+              <button type="button" onclick="addAdminLocation()" class="touch-btn bg-ale-700 hover:bg-ale-800 text-white font-extrabold px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shrink-0">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Lägg till</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="admin-locations-list" class="space-y-2">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button type="button" onclick="closeAdminModal()" class="touch-btn px-6 rounded-xl bg-ale-800 hover:bg-ale-900 text-white font-extrabold text-sm transition">
+          Klar
+        </button>
+      </div>
+    </div>
+  </div>
+
+
   <!-- TOAST NOTIFICATION -->
   <div id="toast-container" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none flex flex-col items-center gap-2 w-full max-w-sm px-4"></div>
 
@@ -765,13 +869,13 @@
        7. APPLICATION JAVASCRIPT
   =========================================== -->
   <script>
-    // --- CONSTANTS & REGISTERS ---
+    // --- CONSTANTS & DEFAULT REGISTERS ---
     const CORRECT_PIN = '1986';
-    const STORAGE_KEY = 'ale_banlogg_state_v2';
+    const STORAGE_KEY = 'ale_banlogg_state_v3';
     const SESSION_AUTH_KEY = 'ale_banlogg_unlocked';
 
-    // Fixed Locations Register
-    const LOCATIONS = [
+    // Default Locations Register
+    const DEFAULT_LOCATIONS = [
       { id: 'Alla hål (1–18)', label: 'Alla hål (1–18)', short: 'Alla 1–18', group: 'ALL_HOLES', icon: 'layers' },
       ...Array.from({ length: 18 }, (_, i) => ({
         id: `Hål ${i + 1}`,
@@ -789,8 +893,8 @@
       { id: 'Verkstad', label: 'Verkstad', short: 'Verkstad', group: 'AREAS', icon: 'wrench' }
     ];
 
-    // Predefined Work Types with Icons and Colors
-    const WORK_TYPES = [
+    // Default Work Types with Icons and Colors
+    const DEFAULT_WORK_TYPES = [
       { id: 'Klippning green', label: 'Klippning green', icon: 'scissors', badgeCls: 'bg-emerald-100 text-emerald-900 border-emerald-300' },
       { id: 'Klippning fairway', label: 'Klippning fairway', icon: 'tractor', badgeCls: 'bg-green-100 text-green-900 border-green-300' },
       { id: 'Klippning tee / foregreen', label: 'Klippning tee / foregreen', icon: 'minimize-2', badgeCls: 'bg-teal-100 text-teal-900 border-teal-300' },
@@ -806,17 +910,21 @@
     ];
 
     const DEFAULT_PROFILES = [
-      'Joel',
-      'Anders Svensson',
-      'Mikael Lind',
-      'Klara Nilsson',
-      'Erik Berg'
+      'Rickard',
+      'Max',
+      'William',
+      'Daniel',
+      'Anton',
+      'Jari',
+      'Lilliann'
     ];
 
     // --- RUNTIME STATE ---
     let appState = {
       profiles: [],
-      currentUser: 'Joel',
+      workTypes: [],
+      locations: [],
+      currentUser: 'Rickard',
       tasks: [],
       history: []
     };
@@ -840,6 +948,16 @@
     let jobModalDirectMode = false;
 
     let currentOpenLocationId = null;
+    let currentAdminSection = 'staff';
+    let editingAdminItem = null; // { section, index }
+
+    function getLocations() {
+      return (appState.locations && appState.locations.length > 0) ? appState.locations : DEFAULT_LOCATIONS;
+    }
+
+    function getWorkTypes() {
+      return (appState.workTypes && appState.workTypes.length > 0) ? appState.workTypes : DEFAULT_WORK_TYPES;
+    }
 
     // --- GENERATE REALISTIC FIELD DEMO PHOTOS (CANVAS DATA URLS) ---
     function generateFieldPhoto(sceneType, labelText) {
@@ -849,7 +967,6 @@
       const ctx = canvas.getContext('2d');
 
       if (sceneType === 'sprinkler') {
-        // Sky & turf
         const grad = ctx.createLinearGradient(0, 0, 0, 300);
         grad.addColorStop(0, '#bae6fd');
         grad.addColorStop(0.45, '#e0f2fe');
@@ -858,13 +975,11 @@
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, 480, 300);
 
-        // Bunker sand shape
         ctx.fillStyle = '#fde68a';
         ctx.beginPath();
         ctx.ellipse(360, 210, 95, 38, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Water puddle & geyser spray
         ctx.fillStyle = '#0284c7';
         ctx.beginPath();
         ctx.ellipse(210, 230, 65, 22, 0, 0, Math.PI * 2);
@@ -879,7 +994,6 @@
           ctx.stroke();
         }
       } else if (sceneType === 'pond') {
-        // Pond & reeds
         const grad = ctx.createLinearGradient(0, 0, 0, 300);
         grad.addColorStop(0, '#d1fae5');
         grad.addColorStop(0.35, '#10b981');
@@ -888,7 +1002,6 @@
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, 480, 300);
 
-        // Tall grass / reeds along edge
         ctx.strokeStyle = '#065f46';
         ctx.lineWidth = 3;
         for (let x = 30; x < 450; x += 14) {
@@ -898,12 +1011,10 @@
           ctx.stroke();
         }
       } else {
-        // Freshly striped golf green
         for (let i = 0; i < 12; i++) {
           ctx.fillStyle = i % 2 === 0 ? '#16a34a' : '#15803d';
           ctx.fillRect(i * 40, 0, 40, 300);
         }
-        // Hole & Flagstick
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
         ctx.ellipse(240, 210, 12, 6, 0, 0, Math.PI * 2);
@@ -923,7 +1034,6 @@
         ctx.fill();
       }
 
-      // Label overlay bar at bottom
       ctx.fillStyle = 'rgba(2, 44, 34, 0.82)';
       ctx.fillRect(0, 252, 480, 48);
       ctx.fillStyle = '#ffffff';
@@ -950,7 +1060,7 @@
           location: 'Hål 7',
           workType: 'Bevattning',
           priority: 'Brådskande',
-          createdBy: 'Anders Svensson',
+          createdBy: 'Rickard',
           createdAt: now - (1.5 * hour),
           comment: 'Sprinklerhuvudet står och läcker vatten ner i bunkern. Stäng ventil 7B och byt packning/munstycke innan lunch.',
           photos: [photoSprinkler]
@@ -961,7 +1071,7 @@
           location: 'Hål 4',
           workType: 'Dammkanter',
           priority: 'Brådskande',
-          createdBy: 'Joel Klerfors',
+          createdBy: 'Max',
           createdAt: now - (3 * hour),
           comment: 'Högt gräs längs hela vänstra dammkanten + lite vass i utloppet. Ta med röjsåg och kratta.',
           photos: [photoPond]
@@ -972,7 +1082,7 @@
           location: 'Alla hål (1–18)',
           workType: 'Hålning',
           priority: 'Normal',
-          createdBy: 'Joel Klerfors',
+          createdBy: 'Rickard',
           createdAt: now - (4 * hour),
           comment: 'Sätt helgpinnar (zon 2 & 3). Kontrollera att alla hålkoppar är vitmålade i kanten.',
           photos: []
@@ -983,7 +1093,7 @@
           location: 'Övningsgreen: Humlegården',
           workType: 'Dressning',
           priority: 'Normal',
-          createdBy: 'Klara Nilsson',
+          createdBy: 'Lilliann',
           createdAt: now - (5.5 * hour),
           comment: 'Lägg en tunn giva sand och borsta in direkt efter klippning.',
           photos: []
@@ -994,7 +1104,7 @@
           location: 'Verkstad',
           workType: 'Maskinservice',
           priority: 'Normal',
-          createdBy: 'Mikael Lind',
+          createdBy: 'Jari',
           createdAt: now - (18 * hour),
           comment: 'Vänster framaggregat tuggar lite ojämnt. Kontrollera understål och justera till 12 mm.',
           photos: []
@@ -1005,7 +1115,7 @@
           location: 'Övningsbunker',
           workType: 'Bunkrar',
           priority: 'Normal',
-          createdBy: 'Erik Berg',
+          createdBy: 'William',
           createdAt: now - (22 * hour),
           comment: 'Kanten mot chipp-ytan behöver skäras ren och bunkern krattas igenom.',
           photos: []
@@ -1016,7 +1126,7 @@
           location: 'Hål 12',
           workType: 'Klippning tee / foregreen',
           priority: 'Normal',
-          createdBy: 'Anders Svensson',
+          createdBy: 'Daniel',
           createdAt: now - (26 * hour),
           comment: 'Tee 58 och foregreen missades igår p.g.a. banarbete.',
           photos: []
@@ -1030,10 +1140,10 @@
           location: 'Alla hål (1–18)',
           workType: 'Klippning green',
           priority: 'Normal',
-          createdBy: 'Joel Klerfors',
+          createdBy: 'Rickard',
           createdAt: now - (5 * hour),
           completedAt: now - (2 * hour),
-          performedBy: ['Joel Klerfors', 'Klara Nilsson'],
+          performedBy: ['Max', 'Lilliann'],
           creatorComment: 'Daglig morgonklippning samt daggvältning.',
           performerComment: 'Klippt på 3.5 mm. Fina och jämna greener hela vägen runt!',
           photos: [photoGreen]
@@ -1044,10 +1154,10 @@
           location: 'Övningsgreen: Puttinggreen',
           workType: 'Klippning green',
           priority: 'Normal',
-          createdBy: 'Klara Nilsson',
+          createdBy: 'Lilliann',
           createdAt: now - (4.5 * hour),
           completedAt: now - (1.8 * hour),
-          performedBy: ['Klara Nilsson'],
+          performedBy: ['Lilliann'],
           creatorComment: 'Samma klipphöjd som banans greener.',
           performerComment: 'Klippt på 3.5 mm samt flyttat två övningshål.',
           photos: []
@@ -1058,10 +1168,10 @@
           location: 'Alla hål (1–18)',
           workType: 'Bunkrar',
           priority: 'Normal',
-          createdBy: 'Anders Svensson',
+          createdBy: 'Rickard',
           createdAt: now - (27 * hour),
           completedAt: now - (23 * hour),
-          performedBy: ['Erik Berg'],
+          performedBy: ['Anton'],
           creatorComment: 'Kör bunkerkrattan i alla greenbunkrar.',
           performerComment: 'Alla bunkrar maskinräfsade. Ersatte trasig kratta på Hål 9.',
           photos: []
@@ -1072,10 +1182,10 @@
           location: 'Hål 4',
           workType: 'Klippning fairway',
           priority: 'Normal',
-          createdBy: 'Joel Klerfors',
+          createdBy: 'Rickard',
           createdAt: now - (29 * hour),
           completedAt: now - (25 * hour),
-          performedBy: ['Mikael Lind'],
+          performedBy: ['William'],
           creatorComment: 'Kör korsmönster på 12 mm.',
           performerComment: 'Klippt enligt plan på 12 mm. Lite blött i svackan på hål 4 men gick bra.',
           photos: []
@@ -1086,10 +1196,10 @@
           location: 'Hål 18',
           workType: 'Dammkanter',
           priority: 'Normal',
-          createdBy: 'Joel Klerfors',
+          createdBy: 'Rickard',
           createdAt: now - (2 * day),
           completedAt: now - (2 * day) + (3 * hour),
-          performedBy: ['Anders Svensson', 'Erik Berg'],
+          performedBy: ['Daniel', 'Anton'],
           creatorComment: 'Trimma stensättningen och kanten mot publikytan.',
           performerComment: 'Trimmat och blåst rent på gångvägen. Damm tömd på skräp.',
           photos: []
@@ -1100,10 +1210,10 @@
           location: 'Övningsgreen: Puttinggreen',
           workType: 'Luftning',
           priority: 'Normal',
-          createdBy: 'Joel Klerfors',
+          createdBy: 'Rickard',
           createdAt: now - (3 * day),
           completedAt: now - (3 * day) + (4 * hour),
-          performedBy: ['Joel Klerfors', 'Mikael Lind'],
+          performedBy: ['Max', 'William'],
           creatorComment: '8 mm solida pinnar för syresättning.',
           performerComment: 'Luftat på 15 cm djup och vältat efteråt.',
           photos: []
@@ -1114,10 +1224,10 @@
           location: 'Driving Range',
           workType: 'Klippning fairway',
           priority: 'Normal',
-          createdBy: 'Anders Svensson',
+          createdBy: 'Rickard',
           createdAt: now - (3 * day),
           completedAt: now - (3 * day) + (2 * hour),
-          performedBy: ['Erik Berg'],
+          performedBy: ['Anton'],
           creatorComment: 'Töm hela fältet på bollar tidigt och klipp.',
           performerComment: 'Plockat ca 8 000 bollar och klippt hela landningsytan.',
           photos: []
@@ -1128,10 +1238,10 @@
           location: 'Alla hål (1–18)',
           workType: 'Hålning',
           priority: 'Normal',
-          createdBy: 'Joel Klerfors',
+          createdBy: 'Rickard',
           createdAt: now - (4 * day),
           completedAt: now - (4 * day) + (2.5 * hour),
-          performedBy: ['Klara Nilsson'],
+          performedBy: ['Lilliann'],
           creatorComment: 'Sätt nya hål samt byt flagga på hål 6 och 14.',
           performerComment: 'Ny flaggplacering satt på alla 18 hål. Nya flaggor på 6 och 14.',
           photos: []
@@ -1142,10 +1252,10 @@
           location: 'Hål 4',
           workType: 'Dammkanter',
           priority: 'Normal',
-          createdBy: 'Anders Svensson',
+          createdBy: 'Daniel',
           createdAt: now - (5 * day),
           completedAt: now - (5 * day) + (2 * hour),
-          performedBy: ['Anders Svensson'],
+          performedBy: ['Daniel'],
           creatorComment: 'Trimma kanten vid främre dammen.',
           performerComment: 'Främre dammkanten vid utslaget klar.',
           photos: []
@@ -1156,10 +1266,10 @@
           location: 'Verkstad',
           workType: 'Maskinservice',
           priority: 'Normal',
-          createdBy: 'Mikael Lind',
+          createdBy: 'Jari',
           createdAt: now - (5 * day),
           completedAt: now - (5 * day) + (3 * hour),
-          performedBy: ['Mikael Lind'],
+          performedBy: ['Jari'],
           creatorComment: '250-timmarsservice på Greensmaster.',
           performerComment: 'Motorolja, filter och tändstift bytta. Maskin rengjord & kontrollerad.',
           photos: []
@@ -1170,10 +1280,10 @@
           location: 'Korthålsbana',
           workType: 'Klippning green',
           priority: 'Normal',
-          createdBy: 'Joel Klerfors',
+          createdBy: 'Rickard',
           createdAt: now - (1 * day) - (4 * hour),
           completedAt: now - (1 * day) - (2 * hour),
-          performedBy: ['Klara Nilsson'],
+          performedBy: ['Lilliann'],
           creatorComment: 'Gör korthålsbanan redo för juniorträningen.',
           performerComment: 'Alla 6 hålen på korthålsbanan klippta och putsade.',
           photos: []
@@ -1184,10 +1294,10 @@
           location: 'Hål 9',
           workType: 'Klippning ruff',
           priority: 'Normal',
-          createdBy: 'Anders Svensson',
+          createdBy: 'Daniel',
           createdAt: now - (2 * day),
           completedAt: now - (2 * day) + (1 * hour),
-          performedBy: ['Erik Berg'],
+          performedBy: ['William'],
           creatorComment: 'Bredda första klippningen vid dogleg.',
           performerComment: 'Klippt på 38 mm enligt plan.',
           photos: []
@@ -1196,7 +1306,9 @@
 
       return {
         profiles: [...DEFAULT_PROFILES],
-        currentUser: 'Joel',
+        workTypes: JSON.parse(JSON.stringify(DEFAULT_WORK_TYPES)),
+        locations: JSON.parse(JSON.stringify(DEFAULT_LOCATIONS)),
+        currentUser: 'Rickard',
         tasks,
         history
       };
@@ -1209,7 +1321,17 @@
         if (saved) {
           const parsed = JSON.parse(saved);
           if (parsed && Array.isArray(parsed.tasks) && Array.isArray(parsed.history)) {
-            appState = parsed;
+            appState = {
+              profiles: Array.isArray(parsed.profiles) && parsed.profiles.length > 0 ? parsed.profiles : [...DEFAULT_PROFILES],
+              workTypes: Array.isArray(parsed.workTypes) && parsed.workTypes.length > 0 ? parsed.workTypes : JSON.parse(JSON.stringify(DEFAULT_WORK_TYPES)),
+              locations: Array.isArray(parsed.locations) && parsed.locations.length > 0 ? parsed.locations : JSON.parse(JSON.stringify(DEFAULT_LOCATIONS)),
+              currentUser: parsed.currentUser || DEFAULT_PROFILES[0],
+              tasks: parsed.tasks,
+              history: parsed.history
+            };
+            if (!appState.profiles.includes(appState.currentUser)) {
+              appState.currentUser = appState.profiles[0];
+            }
             return;
           }
         }
@@ -1354,30 +1476,6 @@
       lucide.createIcons();
     }
 
-    function toggleNewPersonInput() {
-      const box = document.getElementById('new-person-box');
-      const input = document.getElementById('new-person-input');
-      box.classList.toggle('hidden');
-      if (!box.classList.contains('hidden')) {
-        input.focus();
-      }
-    }
-
-    function addNewProfile() {
-      const input = document.getElementById('new-person-input');
-      const name = input.value.trim();
-      if (!name) {
-        showToast('Skriv in ett namn först.', 'error');
-        return;
-      }
-      if (!appState.profiles.includes(name)) {
-        appState.profiles.push(name);
-      }
-      input.value = '';
-      document.getElementById('new-person-box').classList.add('hidden');
-      selectProfile(name);
-    }
-
     function selectProfile(name) {
       appState.currentUser = name;
       saveState();
@@ -1405,7 +1503,7 @@
     }
 
     function updateHeaderProfile() {
-      const name = appState.currentUser || 'Joel';
+      const name = appState.currentUser || appState.profiles[0] || 'Rickard';
       document.getElementById('header-avatar').textContent = getInitials(name);
       
       const usernameEl = document.getElementById('header-username');
@@ -1430,6 +1528,381 @@
         dropdown.classList.add('hidden');
       }
     });
+
+    // ==========================================
+    // PROFILE ADMIN MODAL (STAFF, WORK TYPES, LOCATIONS)
+    // ==========================================
+    function openAdminModal(section = 'staff') {
+      closeProfileMenu();
+      editingAdminItem = null;
+      switchAdminSection(section);
+      document.getElementById('admin-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeAdminModal() {
+      editingAdminItem = null;
+      document.getElementById('admin-modal').classList.add('hidden');
+    }
+
+    function switchAdminSection(section) {
+      currentAdminSection = section;
+      editingAdminItem = null;
+
+      const meta = {
+        staff: { title: 'Redigera personalstyrka', subtitle: 'Lägg till, ändra namn eller ta bort medarbetare', icon: 'user-cog' },
+        worktypes: { title: 'Redigera arbetstyper', subtitle: 'Anpassa arbetstyperna som kan loggas', icon: 'tags' },
+        locations: { title: 'Redigera platser', subtitle: 'Hantera hål, övningsytor och anläggningsplatser', icon: 'map-pinned' }
+      }[section];
+
+      document.getElementById('admin-modal-title').textContent = meta.title;
+      document.getElementById('admin-modal-subtitle').textContent = meta.subtitle;
+
+      ['staff', 'worktypes', 'locations'].forEach(sec => {
+        const tabBtn = document.getElementById(`admin-tab-${sec}`);
+        const contentEl = document.getElementById(`admin-sec-${sec}`);
+        if (sec === section) {
+          tabBtn.className = 'py-2 rounded-xl text-xs font-extrabold transition bg-ale-800 text-white shadow-xs';
+          contentEl.classList.remove('hidden');
+        } else {
+          tabBtn.className = 'py-2 rounded-xl text-xs font-extrabold transition text-slate-600 hover:bg-slate-200/70';
+          contentEl.classList.add('hidden');
+        }
+      });
+
+      renderAdminLists();
+    }
+
+    function renderAdminLists() {
+      // 1. Staff list
+      const staffContainer = document.getElementById('admin-staff-list');
+      staffContainer.innerHTML = appState.profiles.map((person, idx) => {
+        const isEditing = editingAdminItem && editingAdminItem.section === 'staff' && editingAdminItem.index === idx;
+        if (isEditing) {
+          return `
+            <div class="flex items-center gap-2 bg-ale-50/70 p-2.5 rounded-2xl border-2 border-ale-600">
+              <input id="admin-edit-input" type="text" value="${escapeHtml(person)}" onkeydown="if(event.key==='Enter') saveAdminEdit('staff', ${idx})" class="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm font-bold bg-white focus:outline-none focus:ring-2 focus:ring-ale-600" />
+              <button type="button" onclick="saveAdminEdit('staff', ${idx})" class="px-3 py-2 rounded-xl bg-ale-700 text-white text-xs font-extrabold">Spara</button>
+              <button type="button" onclick="cancelAdminEdit()" class="px-2.5 py-2 rounded-xl bg-white border border-slate-300 text-slate-600 text-xs font-bold">Avbryt</button>
+            </div>
+          `;
+        }
+        return `
+          <div class="flex items-center justify-between gap-2 bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-9 h-9 rounded-xl bg-ale-100 text-ale-900 font-extrabold text-xs flex items-center justify-center shrink-0">
+                ${getInitials(person)}
+              </div>
+              <div class="truncate">
+                <p class="text-sm font-extrabold text-slate-900 truncate">${escapeHtml(person)}</p>
+                ${person === appState.currentUser ? '<span class="text-[11px] font-bold text-ale-700">Inloggad nu</span>' : ''}
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button type="button" onclick="startAdminEdit('staff', ${idx})" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition" title="Byt namn">
+                <i data-lucide="pencil" class="w-4 h-4"></i>
+              </button>
+              <button type="button" onclick="deleteAdminStaff(${idx})" class="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition" title="Ta bort">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // 2. WorkTypes list
+      const wtContainer = document.getElementById('admin-worktypes-list');
+      wtContainer.innerHTML = getWorkTypes().map((wt, idx) => {
+        const isEditing = editingAdminItem && editingAdminItem.section === 'worktypes' && editingAdminItem.index === idx;
+        if (isEditing) {
+          return `
+            <div class="flex items-center gap-2 bg-ale-50/70 p-2.5 rounded-2xl border-2 border-ale-600">
+              <input id="admin-edit-input" type="text" value="${escapeHtml(wt.label)}" onkeydown="if(event.key==='Enter') saveAdminEdit('worktypes', ${idx})" class="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm font-bold bg-white focus:outline-none focus:ring-2 focus:ring-ale-600" />
+              <button type="button" onclick="saveAdminEdit('worktypes', ${idx})" class="px-3 py-2 rounded-xl bg-ale-700 text-white text-xs font-extrabold">Spara</button>
+              <button type="button" onclick="cancelAdminEdit()" class="px-2.5 py-2 rounded-xl bg-white border border-slate-300 text-slate-600 text-xs font-bold">Avbryt</button>
+            </div>
+          `;
+        }
+        return `
+          <div class="flex items-center justify-between gap-2 bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl border ${wt.badgeCls} shrink-0">
+                <i data-lucide="${wt.icon || 'tag'}" class="w-4 h-4"></i>
+              </span>
+              <span class="text-sm font-extrabold text-slate-900 truncate">${escapeHtml(wt.label)}</span>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button type="button" onclick="startAdminEdit('worktypes', ${idx})" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition" title="Byt namn">
+                <i data-lucide="pencil" class="w-4 h-4"></i>
+              </button>
+              <button type="button" onclick="deleteAdminWorkType(${idx})" class="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition" title="Ta bort">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // 3. Locations list
+      const locContainer = document.getElementById('admin-locations-list');
+      locContainer.innerHTML = getLocations().map((loc, idx) => {
+        const isEditing = editingAdminItem && editingAdminItem.section === 'locations' && editingAdminItem.index === idx;
+        if (isEditing) {
+          return `
+            <div class="flex items-center gap-2 bg-ale-50/70 p-2.5 rounded-2xl border-2 border-ale-600">
+              <input id="admin-edit-input" type="text" value="${escapeHtml(loc.label)}" onkeydown="if(event.key==='Enter') saveAdminEdit('locations', ${idx})" class="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm font-bold bg-white focus:outline-none focus:ring-2 focus:ring-ale-600" />
+              <button type="button" onclick="saveAdminEdit('locations', ${idx})" class="px-3 py-2 rounded-xl bg-ale-700 text-white text-xs font-extrabold">Spara</button>
+              <button type="button" onclick="cancelAdminEdit()" class="px-2.5 py-2 rounded-xl bg-white border border-slate-300 text-slate-600 text-xs font-bold">Avbryt</button>
+            </div>
+          `;
+        }
+        const groupLabel = loc.group === 'ALL_HOLES' ? 'Hela banan' : loc.group === 'HOLES' ? 'Bana (Hål)' : 'Övningsyta / Anläggning';
+        return `
+          <div class="flex items-center justify-between gap-2 bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded-xl bg-ale-50 text-ale-800 border border-ale-200 flex items-center justify-center font-extrabold text-xs shrink-0">
+                ${loc.holeNum ? loc.holeNum : `<i data-lucide="${loc.icon || 'map-pin'}" class="w-4 h-4"></i>`}
+              </div>
+              <div class="min-w-0">
+                <p class="text-sm font-extrabold text-slate-900 truncate">${escapeHtml(loc.label)}</p>
+                <p class="text-[11px] text-slate-400 font-semibold">${groupLabel}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button type="button" onclick="startAdminEdit('locations', ${idx})" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition" title="Byt namn">
+                <i data-lucide="pencil" class="w-4 h-4"></i>
+              </button>
+              <button type="button" onclick="deleteAdminLocation(${idx})" class="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition" title="Ta bort">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+      const editInput = document.getElementById('admin-edit-input');
+      if (editInput) {
+        editInput.focus();
+        editInput.select();
+      }
+    }
+
+    function startAdminEdit(section, index) {
+      editingAdminItem = { section, index };
+      renderAdminLists();
+    }
+
+    function cancelAdminEdit() {
+      editingAdminItem = null;
+      renderAdminLists();
+    }
+
+    function saveAdminEdit(section, index) {
+      const input = document.getElementById('admin-edit-input');
+      if (!input) return;
+      const newVal = input.value.trim();
+      if (!newVal) {
+        showToast('Namnet får inte vara tomt.', 'error');
+        return;
+      }
+
+      if (section === 'staff') {
+        const oldName = appState.profiles[index];
+        if (newVal !== oldName && appState.profiles.includes(newVal)) {
+          showToast('Personen finns redan i listan.', 'error');
+          return;
+        }
+        appState.profiles[index] = newVal;
+        if (appState.currentUser === oldName) {
+          appState.currentUser = newVal;
+        }
+        appState.tasks.forEach(t => {
+          if (t.createdBy === oldName) t.createdBy = newVal;
+        });
+        appState.history.forEach(h => {
+          if (h.createdBy === oldName) h.createdBy = newVal;
+          if (Array.isArray(h.performedBy)) {
+            h.performedBy = h.performedBy.map(p => p === oldName ? newVal : p);
+          }
+        });
+        updateHeaderProfile();
+        renderProfileSelectionList();
+      } else if (section === 'worktypes') {
+        const oldId = appState.workTypes[index].id;
+        if (newVal !== oldId && appState.workTypes.some(w => w.id.toLowerCase() === newVal.toLowerCase())) {
+          showToast('Arbetstypen finns redan.', 'error');
+          return;
+        }
+        appState.workTypes[index].id = newVal;
+        appState.workTypes[index].label = newVal;
+        appState.tasks.forEach(t => {
+          if (t.workType === oldId) t.workType = newVal;
+        });
+        appState.history.forEach(h => {
+          if (h.workType === oldId) h.workType = newVal;
+        });
+      } else if (section === 'locations') {
+        const oldId = appState.locations[index].id;
+        if (newVal !== oldId && appState.locations.some(l => l.id.toLowerCase() === newVal.toLowerCase())) {
+          showToast('Platsen finns redan.', 'error');
+          return;
+        }
+        appState.locations[index].id = newVal;
+        appState.locations[index].label = newVal;
+        appState.locations[index].short = newVal;
+        appState.tasks.forEach(t => {
+          if (t.location === oldId) t.location = newVal;
+        });
+        appState.history.forEach(h => {
+          if (h.location === oldId) h.location = newVal;
+        });
+      }
+
+      editingAdminItem = null;
+      saveState();
+      populateFilterDropdowns();
+      renderAdminLists();
+      renderAll();
+      showToast('Ändringen sparades');
+    }
+
+    function addAdminStaff() {
+      const input = document.getElementById('admin-new-staff-input');
+      const name = input.value.trim();
+      if (!name) {
+        showToast('Ange ett namn först.', 'error');
+        return;
+      }
+      if (appState.profiles.some(p => p.toLowerCase() === name.toLowerCase())) {
+        showToast('Personen finns redan i personalstyrkan.', 'error');
+        return;
+      }
+      appState.profiles.push(name);
+      input.value = '';
+      saveState();
+      populateFilterDropdowns();
+      renderProfileSelectionList();
+      renderAdminLists();
+      renderAll();
+      showToast(`${name} har lagts till i personalstyrkan`);
+    }
+
+    function deleteAdminStaff(index) {
+      if (appState.profiles.length <= 1) {
+        showToast('Minst en person måste finnas i personalstyrkan.', 'error');
+        return;
+      }
+      const removed = appState.profiles[index];
+      appState.profiles.splice(index, 1);
+      if (appState.currentUser === removed) {
+        appState.currentUser = appState.profiles[0];
+        updateHeaderProfile();
+      }
+      saveState();
+      populateFilterDropdowns();
+      renderProfileSelectionList();
+      renderAdminLists();
+      renderAll();
+      showToast(`${removed} togs bort`);
+    }
+
+    function addAdminWorkType() {
+      const input = document.getElementById('admin-new-wt-input');
+      const label = input.value.trim();
+      if (!label) {
+        showToast('Ange ett namn på arbetstypen.', 'error');
+        return;
+      }
+      if (appState.workTypes.some(w => w.id.toLowerCase() === label.toLowerCase())) {
+        showToast('Arbetstypen finns redan.', 'error');
+        return;
+      }
+      const badgeStyles = [
+        'bg-emerald-100 text-emerald-900 border-emerald-300',
+        'bg-teal-100 text-teal-900 border-teal-300',
+        'bg-sky-100 text-sky-900 border-sky-300',
+        'bg-amber-100 text-amber-900 border-amber-300',
+        'bg-indigo-100 text-indigo-900 border-indigo-300',
+        'bg-purple-100 text-purple-900 border-purple-300'
+      ];
+      const randomBadge = badgeStyles[appState.workTypes.length % badgeStyles.length];
+      appState.workTypes.push({
+        id: label,
+        label: label,
+        icon: 'wrench',
+        badgeCls: randomBadge
+      });
+      input.value = '';
+      saveState();
+      populateFilterDropdowns();
+      renderAdminLists();
+      renderAll();
+      showToast(`Arbetstypen "${label}" lades till`);
+    }
+
+    function deleteAdminWorkType(index) {
+      if (appState.workTypes.length <= 1) {
+        showToast('Minst en arbetstyp måste finnas kvar.', 'error');
+        return;
+      }
+      const removed = appState.workTypes[index];
+      appState.workTypes.splice(index, 1);
+      saveState();
+      populateFilterDropdowns();
+      renderAdminLists();
+      renderAll();
+      showToast(`Arbetstypen "${removed.label}" togs bort`);
+    }
+
+    function addAdminLocation() {
+      const input = document.getElementById('admin-new-loc-input');
+      const groupSelect = document.getElementById('admin-new-loc-group');
+      const label = input.value.trim();
+      const group = groupSelect.value || 'AREAS';
+
+      if (!label) {
+        showToast('Ange ett namn på platsen.', 'error');
+        return;
+      }
+      if (appState.locations.some(l => l.id.toLowerCase() === label.toLowerCase())) {
+        showToast('Platsen finns redan.', 'error');
+        return;
+      }
+
+      const numMatch = label.match(/\d+/);
+      const holeNum = (group === 'HOLES' && numMatch) ? parseInt(numMatch[0], 10) : (group === 'HOLES' ? appState.locations.filter(l => l.group === 'HOLES').length + 1 : undefined);
+
+      appState.locations.push({
+        id: label,
+        label: label,
+        short: holeNum ? `${holeNum}` : label,
+        holeNum: holeNum,
+        group: group,
+        icon: group === 'HOLES' ? 'flag' : 'compass'
+      });
+
+      input.value = '';
+      saveState();
+      populateFilterDropdowns();
+      renderAdminLists();
+      renderAll();
+      showToast(`Platsen "${label}" lades till`);
+    }
+
+    function deleteAdminLocation(index) {
+      if (appState.locations.length <= 1) {
+        showToast('Minst en plats måste finnas kvar.', 'error');
+        return;
+      }
+      const removed = appState.locations[index];
+      appState.locations.splice(index, 1);
+      saveState();
+      populateFilterDropdowns();
+      renderAdminLists();
+      renderAll();
+      showToast(`Platsen "${removed.label}" togs bort`);
+    }
 
     // --- UTILITIES ---
     function getInitials(name) {
@@ -1457,7 +1930,13 @@
     }
 
     function getWorkTypeMeta(typeId) {
-      return WORK_TYPES.find(w => w.id === typeId) || WORK_TYPES[WORK_TYPES.length - 1];
+      const list = getWorkTypes();
+      return list.find(w => w.id === typeId) || {
+        id: typeId || 'Övrigt',
+        label: typeId || 'Övrigt',
+        icon: 'tag',
+        badgeCls: 'bg-purple-100 text-purple-900 border-purple-300'
+      };
     }
 
     function formatRelativeTime(timestamp, includeClock = true) {
@@ -1528,7 +2007,6 @@
           sec.classList.add('hidden');
         }
 
-        // Universal bottom nav styling
         const mobBtn = document.getElementById(`mob-tab-${t}`);
         const mobInd = document.getElementById(`mob-ind-${t}`);
         if (t === tabId) {
@@ -1546,27 +2024,30 @@
 
     // --- POPULATE FILTER DROPDOWNS ---
     function populateFilterDropdowns() {
+      const workTypes = getWorkTypes();
+      const locations = getLocations();
+
       // History WorkType Filter
       const histTypeSelect = document.getElementById('history-type-filter');
       const currentHistType = histTypeSelect.value || 'ALL';
       histTypeSelect.innerHTML = `<option value="ALL">Alla arbetstyper</option>` +
-        WORK_TYPES.map(w => `<option value="${escapeHtml(w.id)}">${escapeHtml(w.label)}</option>`).join('');
-      histTypeSelect.value = currentHistType;
+        workTypes.map(w => `<option value="${escapeHtml(w.id)}">${escapeHtml(w.label)}</option>`).join('');
+      histTypeSelect.value = workTypes.some(w => w.id === currentHistType) ? currentHistType : 'ALL';
 
       // History Location Filter
       const histLocSelect = document.getElementById('history-location-filter');
       const currentHistLoc = histLocSelect.value || 'ALL';
       histLocSelect.innerHTML = `<option value="ALL">Alla platser</option>` +
-        LOCATIONS.map(l => `<option value="${escapeHtml(l.id)}">${escapeHtml(l.label)}</option>`).join('') +
+        locations.map(l => `<option value="${escapeHtml(l.id)}">${escapeHtml(l.label)}</option>`).join('') +
         `<option value="Ingen plats">Ingen specifik plats</option>`;
-      histLocSelect.value = currentHistLoc;
+      histLocSelect.value = (locations.some(l => l.id === currentHistLoc) || currentHistLoc === 'Ingen plats') ? currentHistLoc : 'ALL';
 
       // History Person Filter
       const histPersonSelect = document.getElementById('history-person-filter');
       const currentHistPerson = histPersonSelect.value || 'ALL';
       histPersonSelect.innerHTML = `<option value="ALL">Alla i teamet</option>` +
         appState.profiles.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');
-      histPersonSelect.value = currentHistPerson;
+      histPersonSelect.value = appState.profiles.includes(currentHistPerson) ? currentHistPerson : 'ALL';
     }
 
     // --- RENDER MASTER ---
@@ -1592,6 +2073,7 @@
     // ==========================================
     function renderTodoTab() {
       const urgentTotal = appState.tasks.filter(t => t.priority === 'Brådskande').length;
+      const workTypes = getWorkTypes();
 
       // 1. Populate Work Type Dropdown
       const dropdown = document.getElementById('todo-type-dropdown');
@@ -1599,7 +2081,7 @@
         let optionsHtml = `<option value="ALL">Alla uppgifter (${appState.tasks.length})</option>`;
         optionsHtml += `<option value="URGENT">🔥 Brådskande (${urgentTotal})</option>`;
 
-        WORK_TYPES.forEach(wt => {
+        workTypes.forEach(wt => {
           const count = appState.tasks.filter(t => t.workType === wt.id).length;
           if (count > 0) {
             optionsHtml += `<option value="${escapeHtml(wt.id)}">${escapeHtml(wt.label)} (${count})</option>`;
@@ -1797,63 +2279,57 @@
     }
 
     function renderCourseTab() {
-      // 1. Render "Alla hål (1–18)" Banner Card
-      const allHolesTasks = getTasksForLocation('Alla hål (1–18)', false);
+      const locations = getLocations();
+      const allHolesLoc = locations.find(l => l.group === 'ALL_HOLES') || { id: 'Alla hål (1–18)', label: 'Alla hål (1–18)' };
+
+      // 1. Render "Alla hål (1–18)" Banner Card (utan "Generell banstatus" och utan senaste underhåll i översikten)
+      const allHolesTasks = getTasksForLocation(allHolesLoc.id, false);
       const allHolesUrgent = allHolesTasks.some(t => t.priority === 'Brådskande');
-      const allHolesHist = getHistoryForLocation('Alla hål (1–18)', false);
-      const latestAllHoles = allHolesHist[0];
 
       document.getElementById('all-holes-card-container').innerHTML = `
-        <div onclick="openLocationModal('Alla hål (1–18)')" class="cursor-pointer bg-gradient-to-r from-ale-900 via-ale-800 to-ale-700 text-white rounded-2xl p-4 sm:p-5 shadow-md hover:shadow-lg transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-ale-600">
+        <div onclick="openLocationModal('${escapeHtml(allHolesLoc.id)}')" class="cursor-pointer bg-gradient-to-r from-ale-900 via-ale-800 to-ale-700 text-white rounded-2xl p-4 sm:p-5 shadow-md hover:shadow-lg transition flex items-center justify-between gap-3 border border-ale-600">
           <div class="flex items-center gap-3.5">
-            <div class="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center shrink-0 border border-white/20">
-              <i data-lucide="layers" class="w-6 h-6 text-ale-300"></i>
+            <div class="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center shrink-0 border border-white/20">
+              <i data-lucide="layers" class="w-5 h-5 text-ale-300"></i>
             </div>
-            <div>
-              <div class="flex items-center gap-2">
-                <h3 class="font-extrabold text-base sm:text-lg">Alla hål (1–18) – Generell banstatus</h3>
-                ${allHolesTasks.length > 0 ? `
-                  <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold ${allHolesUrgent ? 'bg-red-500 text-white' : 'bg-ale-400 text-ale-950'}">
-                    ${allHolesTasks.length} aktiva jobb
-                  </span>
-                ` : ''}
-              </div>
-              <p class="text-xs text-ale-100/90 mt-0.5">
-                ${latestAllHoles ? `Senast: ${escapeHtml(latestAllHoles.workType)} (${formatRelativeTime(latestAllHoles.completedAt, false)})` : 'Tryck för att se eller skapa jobb som gäller hela 18-hålsbanan'}
-              </p>
+            <div class="flex flex-wrap items-center gap-2.5">
+              <h3 class="font-extrabold text-base sm:text-lg">${escapeHtml(allHolesLoc.label)}</h3>
+              ${allHolesTasks.length > 0 ? `
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold ${allHolesUrgent ? 'bg-red-500 text-white' : 'bg-ale-400 text-ale-950'}">
+                  ${allHolesTasks.length} aktiva jobb
+                </span>
+              ` : ''}
             </div>
           </div>
-          <div class="flex items-center gap-2 self-end sm:self-center">
+          <div class="flex items-center gap-2 shrink-0">
             <span class="text-xs font-bold bg-white/15 hover:bg-white/25 px-3.5 py-2 rounded-xl flex items-center gap-1.5">
-              <span>Öppna översikt</span>
+              <span class="hidden sm:inline">Öppna</span>
               <i data-lucide="chevron-right" class="w-4 h-4"></i>
             </span>
           </div>
         </div>
       `;
 
-      // 2. Render Holes 1-18 Grid
-      const holes = LOCATIONS.filter(l => l.group === 'HOLES');
-
+      // 2. Render Holes Grid (ren och avskalad utan senaste underhåll i översikten)
+      const holes = locations.filter(l => l.group === 'HOLES');
       const holesContainer = document.getElementById('holes-grid-container');
-      holesContainer.innerHTML = holes.map(hole => {
+      holesContainer.innerHTML = holes.map((hole, idx) => {
         const directTasks = getTasksForLocation(hole.id, false);
         const hasUrgent = directTasks.some(t => t.priority === 'Brådskande');
-        const holeHistory = getHistoryForLocation(hole.id, true);
-        const lastLog = holeHistory[0];
+        const displayNum = hole.holeNum || (idx + 1);
 
         let badgeHtml = '';
         if (directTasks.length > 0) {
           badgeHtml = `
             <span class="px-2 py-0.5 rounded-full text-[11px] font-extrabold flex items-center gap-1 ${hasUrgent ? 'bg-red-600 text-white animate-pulse' : 'bg-amber-400 text-slate-950'}">
               ${hasUrgent ? '<i data-lucide="flame" class="w-3 h-3 fill-current"></i>' : ''}
-              <span>${directTasks.length} jobb</span>
+              <span>${directTasks.length}</span>
             </span>
           `;
         } else {
           badgeHtml = `
             <span class="w-6 h-6 rounded-full bg-ale-50 text-ale-700 flex items-center justify-center">
-              <i data-lucide="check" class="w-3.5 h-3.5 stroke-[2.5]"></i>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 stroke-[2.5]"></i>
             </span>
           `;
         }
@@ -1865,40 +2341,22 @@
             : 'border border-slate-200/90 bg-white hover:border-ale-600';
 
         return `
-          <button type="button" onclick="openLocationModal('${hole.id}')" class="text-left rounded-2xl p-3.5 shadow-xs hover:shadow-md active:scale-98 transition flex flex-col justify-between min-h-[108px] ${borderClass}">
-            <div class="flex items-start justify-between w-full gap-1">
-              <div class="flex items-baseline gap-1">
-                <span class="text-[11px] font-bold uppercase text-slate-400">Hål</span>
-                <span class="text-2xl font-extrabold text-ale-950 leading-none">${hole.holeNum}</span>
-              </div>
-              ${badgeHtml}
+          <button type="button" onclick="openLocationModal('${escapeHtml(hole.id)}')" class="text-left rounded-2xl p-3.5 shadow-xs hover:shadow-md active:scale-98 transition flex items-center justify-between ${borderClass}">
+            <div class="flex items-baseline gap-1.5 min-w-0">
+              <span class="text-xs font-bold uppercase text-slate-400">Hål</span>
+              <span class="text-xl sm:text-2xl font-extrabold text-ale-950 leading-none truncate">${displayNum}</span>
             </div>
-
-            <div class="mt-3 pt-2 border-t border-slate-100 w-full">
-              ${directTasks.length > 0 ? `
-                <p class="text-[11px] font-bold ${hasUrgent ? 'text-red-700' : 'text-amber-900'} truncate">
-                  ⚡ ${escapeHtml(directTasks[0].workType)}
-                </p>
-              ` : lastLog ? `
-                <p class="text-[11px] text-slate-500 font-medium truncate">
-                  ✓ ${escapeHtml(lastLog.workType)}: <span class="font-bold text-slate-700">${formatRelativeTime(lastLog.completedAt, false)}</span>
-                </p>
-              ` : `
-                <p class="text-[11px] text-slate-400">Ingen logg ännu</p>
-              `}
-            </div>
+            ${badgeHtml}
           </button>
         `;
       }).join('');
 
-      // 3. Render Practice Areas & Facility Grid
-      const areas = LOCATIONS.filter(l => l.group === 'AREAS');
+      // 3. Render Practice Areas & Facility Grid (ren och avskalad utan senaste underhåll i översikten)
+      const areas = locations.filter(l => l.group === 'AREAS');
       const areasContainer = document.getElementById('areas-grid-container');
       areasContainer.innerHTML = areas.map(area => {
         const directTasks = getTasksForLocation(area.id, false);
         const hasUrgent = directTasks.some(t => t.priority === 'Brådskande');
-        const areaHist = getHistoryForLocation(area.id, false);
-        const lastLog = areaHist[0];
 
         const borderClass = hasUrgent
           ? 'border-2 border-red-500 bg-white'
@@ -1907,17 +2365,12 @@
             : 'border border-slate-200 bg-white hover:border-ale-600';
 
         return `
-          <button type="button" onclick="openLocationModal('${escapeHtml(area.id)}')" class="text-left rounded-2xl p-4 shadow-xs hover:shadow-md active:scale-98 transition flex items-start justify-between gap-3 ${borderClass}">
-            <div class="flex items-start gap-3 min-w-0">
-              <div class="w-11 h-11 rounded-2xl bg-ale-50 text-ale-800 border border-ale-200 flex items-center justify-center shrink-0 mt-0.5">
-                <i data-lucide="${area.icon}" class="w-5 h-5"></i>
+          <button type="button" onclick="openLocationModal('${escapeHtml(area.id)}')" class="text-left rounded-2xl p-4 shadow-xs hover:shadow-md active:scale-98 transition flex items-center justify-between gap-3 ${borderClass}">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-10 h-10 rounded-2xl bg-ale-50 text-ale-800 border border-ale-200 flex items-center justify-center shrink-0">
+                <i data-lucide="${area.icon || 'compass'}" class="w-5 h-5"></i>
               </div>
-              <div class="min-w-0">
-                <h4 class="font-extrabold text-sm sm:text-base text-slate-900 truncate">${escapeHtml(area.label)}</h4>
-                <p class="text-xs text-slate-500 mt-1 truncate">
-                  ${lastLog ? `Senast: <strong class="text-slate-700">${escapeHtml(lastLog.workType)}</strong> (${formatRelativeTime(lastLog.completedAt, false)})` : 'Ingen historik registrerad'}
-                </p>
-              </div>
+              <h4 class="font-extrabold text-sm sm:text-base text-slate-900 truncate">${escapeHtml(area.label)}</h4>
             </div>
 
             <div class="shrink-0">
@@ -1952,7 +2405,8 @@
     }
 
     function renderLocationModalContent(locationId) {
-      const locObj = LOCATIONS.find(l => l.id === locationId) || { id: locationId, label: locationId, short: '📍' };
+      const locations = getLocations();
+      const locObj = locations.find(l => l.id === locationId) || { id: locationId, label: locationId, short: '📍' };
       document.getElementById('loc-modal-title').textContent = locObj.label;
       document.getElementById('loc-modal-badge').innerHTML = locObj.holeNum
         ? locObj.holeNum
@@ -1963,7 +2417,7 @@
         openJobModal(null, locationId, false);
       };
 
-      // 1. Active Tasks on this location (plus general 1-18 tasks if hole)
+      // 1. Active Tasks on this location
       const activeTasks = getTasksForLocation(locationId, true);
       const activeListEl = document.getElementById('loc-modal-active-list');
       if (activeTasks.length === 0) {
@@ -1976,11 +2430,13 @@
         activeListEl.innerHTML = activeTasks.map(t => renderTaskCardHtml(t)).join('');
       }
 
-      // 2. Latest Maintenance Summary Matrix
+      // 2. Latest Maintenance Summary Matrix (visas först här inne när man klickat på hålet/platsen)
       const locHistory = getHistoryForLocation(locationId, true);
-      const keyTypes = locObj.id === 'Verkstad'
+      const defaultKeyTypes = locObj.id === 'Verkstad'
         ? ['Maskinservice', 'Övrigt']
         : ['Klippning green', 'Klippning fairway', 'Dammkanter', 'Hålning', 'Bunkrar', 'Bevattning'];
+      const loggedTypesOnLoc = [...new Set(locHistory.map(h => h.workType))];
+      const keyTypes = [...new Set([...loggedTypesOnLoc, ...defaultKeyTypes])].slice(0, 6);
 
       const maintContainer = document.getElementById('loc-modal-last-maint');
       maintContainer.innerHTML = keyTypes.map(typeId => {
@@ -1994,7 +2450,7 @@
             </div>
             ${latestMatch ? `
               <p class="text-xs font-extrabold text-ale-800">${formatRelativeTime(latestMatch.completedAt)}</p>
-              <p class="text-[11px] text-slate-500 truncate">Av ${escapeHtml(latestMatch.performedBy.map(getShortName).join(', '))}</p>
+              <p class="text-[11px] text-slate-500 truncate">Av ${escapeHtml((latestMatch.performedBy || []).map(getShortName).join(', '))}</p>
             ` : `
               <p class="text-xs text-slate-400 font-medium">Ej loggat nyligen</p>
             `}
@@ -2307,6 +2763,9 @@
       editingJobId = editTaskId;
       jobModalDirectMode = directLogMode;
 
+      const locations = getLocations();
+      const workTypes = getWorkTypes();
+
       const titleInput = document.getElementById('job-title-input');
       const commentInput = document.getElementById('job-comment-input');
       const directBtn = document.getElementById('job-direct-log-btn');
@@ -2328,8 +2787,9 @@
         titleInput.value = task.title;
         commentInput.value = task.comment || '';
       } else {
-        jobModalLocation = preselectedLocation || 'Hål 1';
-        jobModalWorkType = 'Klippning green';
+        const defaultHole = locations.find(l => l.group === 'HOLES') || locations[0];
+        jobModalLocation = preselectedLocation || (defaultHole ? defaultHole.id : 'Ingen plats');
+        jobModalWorkType = workTypes[0] ? workTypes[0].id : 'Klippning green';
         jobModalPriority = 'Normal';
         jobModalPhotos = [];
         titleInput.value = '';
@@ -2353,12 +2813,11 @@
         fillSuggestedTitle(true);
       }
 
-      // Determine location group tab
       if (!jobModalLocation || jobModalLocation === 'Ingen plats') {
         jobModalLocation = 'Ingen plats';
         jobModalLocationGroup = 'NONE';
       } else {
-        const locMeta = LOCATIONS.find(l => l.id === jobModalLocation);
+        const locMeta = locations.find(l => l.id === jobModalLocation);
         jobModalLocationGroup = locMeta ? locMeta.group : 'HOLES';
       }
 
@@ -2377,21 +2836,28 @@
     }
 
     function setJobLocationGroup(group) {
+      const locations = getLocations();
       jobModalLocationGroup = group;
       if (group === 'NONE') {
         selectJobLocation('Ingen plats');
       } else if (group === 'ALL_HOLES') {
-        selectJobLocation('Alla hål (1–18)');
-      } else if (group === 'HOLES' && !jobModalLocation.startsWith('Hål ')) {
-        selectJobLocation('Hål 1');
-      } else if (group === 'AREAS' && (jobModalLocation.startsWith('Hål ') || jobModalLocation === 'Alla hål (1–18)' || jobModalLocation === 'Ingen plats')) {
-        selectJobLocation('Driving Range');
+        const allHoles = locations.find(l => l.group === 'ALL_HOLES');
+        selectJobLocation(allHoles ? allHoles.id : 'Alla hål (1–18)');
+      } else if (group === 'HOLES') {
+        const firstHole = locations.find(l => l.group === 'HOLES');
+        if (!locations.some(l => l.group === 'HOLES' && l.id === jobModalLocation)) {
+          selectJobLocation(firstHole ? firstHole.id : 'Hål 1');
+        }
+      } else if (group === 'AREAS') {
+        const firstArea = locations.find(l => l.group === 'AREAS');
+        if (!locations.some(l => l.group === 'AREAS' && l.id === jobModalLocation)) {
+          selectJobLocation(firstArea ? firstArea.id : 'Driving Range');
+        }
       }
       renderJobLocationSelectors();
     }
 
     function selectJobLocation(locId) {
-      // Allow clicking an already selected hole or area to deselect it ('Ingen plats')
       if (locId !== 'Ingen plats' && jobModalLocation === locId && (jobModalLocationGroup === 'HOLES' || jobModalLocationGroup === 'AREAS')) {
         jobModalLocation = 'Ingen plats';
         jobModalLocationGroup = 'NONE';
@@ -2405,6 +2871,8 @@
     }
 
     function renderJobLocationSelectors() {
+      const locations = getLocations();
+
       ['HOLES', 'ALL_HOLES', 'AREAS', 'NONE'].forEach(grp => {
         const btn = document.getElementById(`loc-grp-${grp}`);
         if (!btn) return;
@@ -2421,24 +2889,25 @@
       if (jobModalLocationGroup === 'HOLES') {
         holesGrid.classList.remove('hidden');
         areasGrid.classList.add('hidden');
-        const holes = LOCATIONS.filter(l => l.group === 'HOLES');
-        holesGrid.innerHTML = holes.map(h => {
+        const holes = locations.filter(l => l.group === 'HOLES');
+        holesGrid.innerHTML = holes.map((h, idx) => {
           const active = jobModalLocation === h.id;
+          const displayNum = h.holeNum || h.short || (idx + 1);
           return `
-            <button type="button" onclick="selectJobLocation('${h.id}')" class="h-11 rounded-xl font-extrabold text-sm border transition ${active ? 'bg-ale-800 text-white border-ale-800 shadow-xs scale-105' : 'bg-slate-50 text-slate-800 border-slate-200 hover:bg-ale-50'}">
-              ${h.holeNum}
+            <button type="button" onclick="selectJobLocation('${escapeHtml(h.id)}')" class="h-11 rounded-xl font-extrabold text-sm border transition ${active ? 'bg-ale-800 text-white border-ale-800 shadow-xs scale-105' : 'bg-slate-50 text-slate-800 border-slate-200 hover:bg-ale-50'}">
+              ${escapeHtml(String(displayNum))}
             </button>
           `;
         }).join('');
       } else if (jobModalLocationGroup === 'AREAS') {
         holesGrid.classList.add('hidden');
         areasGrid.classList.remove('hidden');
-        const areas = LOCATIONS.filter(l => l.group === 'AREAS');
+        const areas = locations.filter(l => l.group === 'AREAS');
         areasGrid.innerHTML = areas.map(a => {
           const active = jobModalLocation === a.id;
           return `
             <button type="button" onclick="selectJobLocation('${escapeHtml(a.id)}')" class="touch-btn px-3.5 py-2.5 rounded-xl font-bold text-xs sm:text-sm border text-left flex items-center gap-2 transition ${active ? 'bg-ale-800 text-white border-ale-800 shadow-xs' : 'bg-slate-50 text-slate-800 border-slate-200 hover:bg-ale-50'}">
-              <i data-lucide="${a.icon}" class="w-4 h-4 shrink-0"></i>
+              <i data-lucide="${a.icon || 'compass'}" class="w-4 h-4 shrink-0"></i>
               <span class="truncate">${escapeHtml(a.label)}</span>
             </button>
           `;
@@ -2454,13 +2923,14 @@
     }
 
     function renderJobWorkTypeGrid() {
+      const workTypes = getWorkTypes();
       const container = document.getElementById('job-worktype-grid');
-      container.innerHTML = WORK_TYPES.map(wt => {
+      container.innerHTML = workTypes.map(wt => {
         const active = jobModalWorkType === wt.id;
         return `
           <button type="button" onclick="selectJobWorkType('${escapeHtml(wt.id)}')" class="touch-btn p-2.5 rounded-xl border-2 text-left flex items-center gap-2 font-bold text-xs transition ${active ? 'border-ale-700 bg-ale-50 text-ale-950 shadow-2xs' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'}">
             <div class="w-7 h-7 rounded-lg ${active ? 'bg-ale-700 text-white' : 'bg-slate-100 text-slate-600'} flex items-center justify-center shrink-0">
-              <i data-lucide="${wt.icon}" class="w-4 h-4"></i>
+              <i data-lucide="${wt.icon || 'tag'}" class="w-4 h-4"></i>
             </div>
             <span class="leading-tight">${escapeHtml(wt.label)}</span>
           </button>
@@ -2490,9 +2960,10 @@
     }
 
     function fillSuggestedTitle(force = false) {
+      const workTypes = getWorkTypes();
       const input = document.getElementById('job-title-input');
       const currentVal = input.value.trim();
-      const isAutoLooking = !currentVal || WORK_TYPES.some(w => currentVal.startsWith(w.label));
+      const isAutoLooking = !currentVal || workTypes.some(w => currentVal.startsWith(w.label));
       if (force || isAutoLooking) {
         input.value = (jobModalLocation && jobModalLocation !== 'Ingen plats')
           ? `${jobModalWorkType} – ${jobModalLocation}`
@@ -2647,7 +3118,7 @@
       document.getElementById('lightbox-modal').classList.add('hidden');
     }
 
-    // --- CONFIRMATION DIALOGS (NO NATIVE ALERT/CONFIRM) ---
+    // --- CONFIRMATION DIALOGS ---
     function openConfirmModal(title, message, onConfirm) {
       document.getElementById('confirm-title').textContent = title;
       document.getElementById('confirm-message').textContent = message;
@@ -2698,12 +3169,13 @@
       closeProfileMenu();
       openConfirmModal(
         'Återställ demodata?',
-        'Detta återställer alla uppgifter, profiler och historik till Ale Banloggs ursprungliga exempeldata.',
+        'Detta återställer alla uppgifter, personalstyrka, arbetstyper, platser och historik till Ale Banloggs ursprungliga exempeldata.',
         () => {
           appState = createInitialDemoData();
           saveState();
           populateFilterDropdowns();
           updateHeaderProfile();
+          renderProfileSelectionList();
           renderAll();
           showToast('Demodata har återställts');
         }
